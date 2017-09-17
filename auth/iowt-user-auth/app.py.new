@@ -1,0 +1,25 @@
+import urlparse
+import sys
+import boto3
+import botocore
+import jwt
+import datetime
+import json
+import jinja2
+import os
+
+from base64 import urlsafe_b64decode, b64decode
+from Crypto.Util.number import bytes_to_long
+from Crypto.PublicKey import RSA
+
+from jwt.contrib.algorithms.pycrypto import RSAAlgorithm
+#jwt.register_algorithm('RS256', RSAAlgorithm(RSAAlgorithm.SHA256))
+
+
+from chalice import Chalice, Response
+app = Chalice(app_name='iowt_auth')
+
+@app.route('/authform')
+def auth_form():
+    return Response(body="Hello World",
+                    status_code=200)
