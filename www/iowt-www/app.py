@@ -1,15 +1,15 @@
+import base64
+import copy
 import botocore
 import boto3
 import jinja2
 import sys
 import json
 import os
-
 import urllib
 
 from chalice import Chalice, Response
 app = Chalice(app_name='iowt-www')
-
 
 S3_CLIENT = boto3.client('s3', region_name="eu-west-1")
 IDP_CLIENT = boto3.client('cognito-idp')
@@ -67,7 +67,8 @@ def get_user_data(headers):
         return False
 
 
-@app.route('/')
+@app.route('/',
+           methods=['GET'])
 def index():
     s3_bucket = os.environ['bucket']
     pub_bucket_url = os.environ['pubbucketurl']
@@ -99,4 +100,54 @@ def index():
         return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
                         status_code=500,
                         headers=default_header)
+
+
+@app.route('/newevent',
+           methods=['POST'])
+def event_post():
+# Posted data structure
+#CONTENT_TEMPLATE = {"timestamp": str(),
+#                    "event_id": str(),
+#                    "device_id": str()
+#                    "event_data": {"creature_weight": int(),
+#                                   "food_level": int(),
+#                                   "water_level": int(),
+#                                   "image_data": str(),
+#                                   "image_type": str()}}
+
+    try:
+        s3_bucket = os.environ['event_bucket']
+
+        request = app.current_request
+        json_data = json.loads(request.raw_body.decode())
+
+        file_content = base64.b64decode(json_data['event_data']['image_data'])
+        metadata = {'timestamp': json_data['timestamp'],
+                    'device_id': json_data['device_id']}
+
+        S3_CLIENT.put_object(Body=file_content,
+                             Metadata=metadata,
+                             Bucket=s3_bucket,
+                             Key=json_data['event_id'] + "." + json_data['event_data']['image_type'])
+
+
+        return Response(body="OK",
+                        status_code=200,
+                        headers={'Content-Type': 'text/html',
+                                 'Access-Control-Allow-Origin': '*'})
+    except:
+        return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
+                        status_code=500,
+                        headers=default_header)
+
+
+
+
+
+
+
+
+
+
+
 
