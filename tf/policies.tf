@@ -55,9 +55,26 @@ data "aws_iam_policy_document" "iowt-www-policy-document" {
 
   statement {
     sid = "4"
+    actions = ["s3:GetObject",
+               "s3:PutObject"]
+    resources = ["arn:aws:s3:::iowt-events/*"]
+    effect = "Allow"
+  }
+
+  statement {
+    sid = "5"
     actions = ["cognito-idp:AdminListGroupsForUser",
                "cognito-idp:AdminGetUser"]
     resources = ["arn:aws:cognito-idp:*:*:*"]
+    effect = "Allow"
+  }
+
+  statement {
+    sid = "6"
+    actions = ["dynamodb:DeleteItem",
+               "dynamodb:PutItem",
+               "dynamodb:Scan"]
+    resources = ["arn:aws:dynamodb:eu-west-1:*:table/iowt-events"]
     effect = "Allow"
   }
 }

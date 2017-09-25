@@ -13,6 +13,7 @@ app = Chalice(app_name='iowt-www')
 
 S3_CLIENT = boto3.client('s3', region_name="eu-west-1")
 IDP_CLIENT = boto3.client('cognito-idp')
+DDB_CLIENT = boto3.client('dynamodb')
 
 default_header = {'Content-Type': 'text/html; charset=UTF-8'}
 
@@ -117,6 +118,7 @@ def event_post():
 
     try:
         s3_bucket = os.environ['event_bucket']
+        ddb_table = os.environ['ddbtable']
 
         request = app.current_request
         json_data = json.loads(request.raw_body.decode())
@@ -124,6 +126,18 @@ def event_post():
         file_content = base64.b64decode(json_data['event_data']['image_data'])
         metadata = {'timestamp': json_data['timestamp'],
                     'device_id': json_data['device_id']}
+
+        db_item = dict()
+        db_item['id'] = {'S': json_data['event_id'] }
+        db_item['timestamp'] = {'S': json_data['timestamp']}
+        db_item['device_id'] = {'S': json_data['device_id']}
+        db_item['image_id'] = {'S': json_data['event_id'] + "." + json_data['event_data']['image_type']}
+        db_item['creature_weight'] = {'N': str(json_data['event_data']['creature_weight'])}
+        db_item['food_level'] = {'N': str(json_data['event_data']['food_level'])}
+        db_item['water_level'] = {'N': str(json_data['event_data']['water_level'])}
+
+        DDB_CLIENT.put_item(TableName=ddb_table,
+                            Item=db_item)
 
         S3_CLIENT.put_object(Body=file_content,
                              Metadata=metadata,
@@ -135,19 +149,11 @@ def event_post():
                         status_code=200,
                         headers={'Content-Type': 'text/html',
                                  'Access-Control-Allow-Origin': '*'})
+
     except:
         return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
                         status_code=500,
-                        headers=default_header)
-
-
-
-
-
-
-
-
-
+                        headers={'Content-Type': 'text/plain'})
 
 
 

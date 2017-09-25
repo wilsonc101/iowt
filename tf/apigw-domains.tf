@@ -72,6 +72,14 @@ resource "aws_api_gateway_base_path_mapping" "robotika-iowt-api" {
   api_id      = "${aws_api_gateway_rest_api.iowt-api-auth.id}"
   stage_name  = "${aws_api_gateway_deployment.iowt-api-auth-dev.stage_name}"
   domain_name = "${aws_api_gateway_domain_name.robotika-iowt-api.domain_name}"
+  base_path = "token"
+}
+
+resource "aws_api_gateway_base_path_mapping" "robotika-iowt-api-event" {
+  api_id      = "${aws_api_gateway_rest_api.iowt-www.id}"
+  stage_name  = "${aws_api_gateway_deployment.iowt-www-dev.stage_name}"
+  domain_name = "${aws_api_gateway_domain_name.robotika-iowt-api.domain_name}"
+  base_path = "event"
 }
 
 
