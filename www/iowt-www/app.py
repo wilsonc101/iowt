@@ -8,6 +8,7 @@ import json
 import os
 import urllib
 
+
 from chalice import Chalice, Response
 app = Chalice(app_name='iowt-www')
 
@@ -143,7 +144,6 @@ def event_post():
                              Metadata=metadata,
                              Bucket=s3_bucket,
                              Key=json_data['event_id'] + "." + json_data['event_data']['image_type'])
-
 
         return Response(body="OK",
                         status_code=200,

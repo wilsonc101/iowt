@@ -1,0 +1,8 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+} 
+
+.input-group-addon {
+    min-width:150px;
+    text-align:left;
+}

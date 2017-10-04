@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/iowt.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+  <script src="scripts/bootstrap.min.js"></script>
+    
+</head>
+<body>
+  <!-- NAV BAR -->    
+  <!-- <div class="container-fluid"> -->
+  <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#"></a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="sightings.html">Sightings</a></li>
+        <li class="active"><a href="#">My Things</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+  </nav>
+  <!-- </div> -->
+    
+  <div class="container-fluid">
+      <div class="row">
+          <aside class="col-sm-12">
+              <h3>My Things</h3>
+          </aside>
+      </div>
+      <div class="row">
+        <section class="col-sm-12">
+              <table class="table table-hover">
+                <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>    
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th> </th>
+                </tr>
+                </thead>
+                <tbody>
+                
+                <tr>
+                    <td>890xyz</td>
+                    <td><em>Outside2</em></td>
+                    <td><em>In the front garden</em></td>
+                    
+                        <td class="danger">Online</td>
+                    
+                    <td class="text-right">
+                        <button class="btn btn-default"  
+                                data-deviceid="890xyz"
+                                data-devicename="Outside2"
+                                data-devicelocation="In the front garden"
+                                data-toggle="modal" 
+                                data-target="#myModal">Edit</button>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>123abc</td>
+                    <td><em>Outside1</em></td>
+                    <td><em>In the front garden</em></td>
+                    
+                        <td class="success">Online</td>
+                    
+                    <td class="text-right">
+                        <button class="btn btn-default"  
+                                data-deviceid="123abc"
+                                data-devicename="Outside1"
+                                data-devicelocation="In the front garden"
+                                data-toggle="modal" 
+                                data-target="#myModal">Edit</button>
+                    </td>
+                </tr>
+                  
+
+              </tbody>  
+              </table>
+          </section>
+      </div>
+  </div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">id       </span>
+            <input class="form-control" type="text" name="deviceId" id="deviceId" placeholder="" readonly />
+        </div>        
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">name     </span>
+            <input class="form-control" type="text" name="deviceName" id="deviceName" placeholder=""/>
+        </div>        
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">location </span>
+            <input class="form-control" type="text" name="deviceLocation" id="deviceLocation" placeholder="" />
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="save_device_data();">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="scripts/iowt.js"></script>
+
+    
+</body>
+</html>
