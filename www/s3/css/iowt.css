@@ -6,3 +6,15 @@ body {
     min-width:150px;
     text-align:left;
 }
+
+.progress {
+    height: 35px;
+}
+
+.table tbody > tr > td.vert-aligned {
+    vertical-align: middle !important;
+}
+
+.table > tbody > tr > td > .progress {
+    margin-bottom: 0px !important;
+}

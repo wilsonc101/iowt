@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
   <script src="scripts/bootstrap.min.js"></script>
-  <script src="scripts/iowt.js"></script>
     
 </head>
 <body>
@@ -62,9 +61,9 @@
                     <td><em>{{device.name}}</em></td>
                     <td><em>{{device.location}}</em></td>
                     {% if device.status == "online" %}
-                        <td class="success">Online</td>
+                        <td class="success">{{device.status}}</td>
                     {% elif device.status == "offline" %}
-                        <td class="danger">Online</td>
+                        <td class="danger">{{device.status}}</td>
                     {% else %}
                         <td class="warning">{{device.status}}</td>
                     {% endif %}
@@ -91,7 +90,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+        <h4 class="modal-title" id="myModalLabel">Thing Details</h4>
       </div>
       <div class="modal-body">
         <div class="input-group">
@@ -100,11 +99,11 @@
         </div>        
         <div class="input-group">
             <span class="input-group-addon" id="basic-addon1">name     </span>
-            <input class="form-control" type="text" name="deviceName" id="deviceId" placeholder=""/>
+            <input class="form-control" type="text" name="deviceName" id="deviceName" placeholder=""/>
         </div>        
         <div class="input-group">
             <span class="input-group-addon" id="basic-addon1">location </span>
-            <input class="form-control" type="text" name="deviceLocation" id="deviceId" placeholder="" />
+            <input class="form-control" type="text" name="deviceLocation" id="deviceLocation" placeholder="" />
         </div>
 
       </div>
@@ -115,29 +114,9 @@
     </div>
   </div>
 </div>
-    
-<script type="text/javascript">
-$('#myModal').on('show.bs.modal', function(e) {
-  var deviceId = e.relatedTarget.dataset.deviceid;
-  var deviceName = e.relatedTarget.dataset.devicename;
-  var deviceLocation = e.relatedTarget.dataset.devicelocation;
+   
+<script src="scripts/iowt.js"></script>
 
-    
-  $(e.currentTarget).find('input[name="deviceId"]').val(deviceId);
-  $(e.currentTarget).find('input[name="deviceName"]').val(deviceName);
-  $(e.currentTarget).find('input[name="deviceLocation"]').val(deviceLocation);
-});
-</script>
-
-<script type="text/javascript">
-$('#save_device_data').click(function() {
-  $select_value = $("#deviceLocation").value();
-  console.log($select_value);
-  $('#myModal').modal('hide');
-});
-</script>
-
-    
     
 </body>
 </html>

@@ -35,16 +35,21 @@ response = ddb_device_table.scan(FilterExpression=Attr('owner').eq(owner))
 for item in response['Items']:
     things.append(item)
 
-# loop devices and get events
-#for thing in things.keys():
-#    response = ddb_event_table.scan(FilterExpression=Attr('device_id').eq(thing))
-#    things[thing]['events'] = response['Items']
-
-with open("../s3/device.html", "w") as html_file:
+with open("s3/device.html", "w") as html_file:
     file_content = render_s3_template(S3_CLIENT, s3_bucket, "mythings.tmpl", {"devices": things})
     html_file.write(file_content)
-#                    <td>{{device.id}}</td>
-#                    <td><em>{{device.name}}</em></td>
-#                    <td><em>{{</em></td>
-#                    device.status == "online" 
+
+
+events = list()
+# loop devices and get events
+for thing in things:
+    response = ddb_event_table.scan(FilterExpression=Attr('device_id').eq(thing['id']))
+    if len(response['Items']) > 0:
+        for event in response['Items']:
+            events.append(event)
+
+
+print(events)
+
+
 

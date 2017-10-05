@@ -54,27 +54,77 @@
                 </tr>
                 </thead>
                 <tbody>
+                {% for event in events %}
                 <tr>
                     <td><img class="media-object" src="..." alt="..."></td>
-                    <td>1</td>
-                    <td>B</td>
-                    <td>!</td>
+                    <td>{{event.timestamp}}</td>
+                    <td>{{event.device_id}}</td>
+                    <td>{{event.image}}</td>
+                    <td class="text-right">
+                        <button class="btn btn-default"
+                                data-creatureweight="{{event.creatureweight}}"
+                                data-foodlevel="{{event.foodlevel}}"
+                                data-waterlevel="{{event.waterlevel}}"
+                                data-toggle="modal"
+                                data-target="#eventModal">Sensors</button>
+                    </td>
+
                 </tr>
-                <tr>
-                    <td><img class="media-object" src="..." alt="..."></td>
-                    <td>1</td>
-                    <td>B</td>
-                    <td>!</td>
-                </tr>
-                <tr>
-                    <td><img class="media-object" src="..." alt="..."></td>
-                    <td>1</td>
-                    <td>B</td>
-                    <td>!</td>
-                </tr>
+                {% endif %}
                 </tbody>  
               </table>
           </section>
       </div>
   </div>
 </body>
+
+
+
+
+
+                {% for device in devices %}
+                <tr>
+                    <td>{{device.id}}</td>
+                    <td><em>{{device.name}}</em></td>
+                    <td><em>{{device.location}}</em></td>
+                    {% if device.status == "online" %}
+                        <td class="success">{{device.status}}</td>
+                    {% elif device.status == "offline" %}
+                        <td class="danger">{{device.status}}</td>
+                    {% else %}
+                        <td class="warning">{{device.status}}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Sensor Data</h4>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">weight</span>
+            <input class="form-control" type="text" name="deviceId" id="deviceId" placeholder="" readonly />
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">food  </span>
+            <input class="form-control" type="text" name="deviceName" id="deviceName" placeholder=""/>
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">water </span>
+            <input class="form-control" type="text" name="deviceLocation" id="deviceLocation" placeholder="" />
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="save_device_data();">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
