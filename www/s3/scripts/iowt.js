@@ -8,9 +8,7 @@ $('#myModal').on('show.bs.modal', function(e) {
   $(e.currentTarget).find('input[name="deviceId"]').val(deviceId);
   $(e.currentTarget).find('input[name="deviceName"]').val(deviceName);
   $(e.currentTarget).find('input[name="deviceLocation"]').val(deviceLocation);
-  var bar = document.getElementById("progbar");
-  bar.style.width = deviceNum.concat("%");
-  console.log(bar);
+
 });
 
 function save_device_data() {
@@ -21,14 +19,17 @@ function save_device_data() {
 
 
 $('#eventModal').on('show.bs.modal', function(e) {
-  var deviceId = e.relatedTarget.dataset.deviceid;
-  var deviceName = e.relatedTarget.dataset.devicename;
-  var deviceLocation = e.relatedTarget.dataset.devicelocation;
+  var creatureWeight = e.relatedTarget.dataset.creatureweight;
+  var foodLevel = e.relatedTarget.dataset.foodlevel;
+  var waterLevel = e.relatedTarget.dataset.waterlevel;
 
+  $(e.currentTarget).find('input[name="creatureWeight"]').val(creatureWeight);
 
-  $(e.currentTarget).find('input[name="deviceId"]').val(deviceId);
-  $(e.currentTarget).find('input[name="deviceName"]').val(deviceName);
-  $(e.currentTarget).find('input[name="deviceLocation"]').val(deviceLocation);
+  var foodBar = document.getElementById("progbar-food");
+  foodBar.style.width = foodLevel.concat("%");
+
+  var waterBar = document.getElementById("progbar-water");
+  waterBar.style.width = waterLevel.concat("%");
 });
 
 

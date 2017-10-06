@@ -1,7 +1,7 @@
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 import jinja2
-
+import json
 
 DDB_RESOURCE = boto3.resource('dynamodb')
 S3_CLIENT = boto3.client('s3', region_name="eu-west-1")
@@ -15,6 +15,7 @@ s3_bucket = "iowt"
 
 owner = "chrisw"
 
+isAdmin = True
 
 
 def render_s3_template(client, bucket, template_name, content=None):
@@ -35,8 +36,11 @@ response = ddb_device_table.scan(FilterExpression=Attr('owner').eq(owner))
 for item in response['Items']:
     things.append(item)
 
-with open("s3/device.html", "w") as html_file:
-    file_content = render_s3_template(S3_CLIENT, s3_bucket, "mythings.tmpl", {"devices": things})
+with open("s3/mythings.html", "w") as html_file:
+    file_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                      "mythings.tmpl",
+                                      {"devices": things,
+                                       "isadmin": isAdmin})
     html_file.write(file_content)
 
 
@@ -46,10 +50,20 @@ for thing in things:
     response = ddb_event_table.scan(FilterExpression=Attr('device_id').eq(thing['id']))
     if len(response['Items']) > 0:
         for event in response['Items']:
-            events.append(event)
+            event_data = dict()
+            event_data['timestamp'] = event['timestamp']
+            event_data['device_id'] = event['device_id']
+            event_data['image'] = event['image_id']
 
+            event_data['creatureweight'] = str(event['creature_weight'])
+            event_data['foodlevel'] = str(event['food_level'])
+            event_data['waterlevel'] = str(event['water_level'])
 
-print(events)
+            events.append(event_data)
 
-
-
+with open("s3/sightings.html", "w") as html_file:
+    file_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                      "sightings.tmpl",
+                                     {"events": events,
+                                      "isadmin": isAdmin})
+    html_file.write(file_content)

@@ -22,15 +22,15 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#"></a>
+      <a class="navbar-brand" href="#">{{ icon_path }}</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-right">
-        
+        {% if isadmin %}
           <li><a href="admin.html">Admin</a></li>
-        
+        {% endif %}
         <li class="active"><a href="#">Sightings</a></li>
         <li><a href="mythings.html">My Things</a></li>
       </ul>
@@ -58,39 +58,23 @@
                 </thead>
                 <tbody>
 
-                
+                {% for event in events %}
                 <tr>
                     <td><img class="media-object" src="..." alt="..."></td>
-                    <td>02/10/17 22:08:35</td>
-                    <td>123abc</td>
-                    <td><a href="f4b0ea5f-869c-407b-905f-2dab9235cb67.jpg}">full image</a></td>
+                    <td>{{event.timestamp}}</td>
+                    <td>{{event.device_id}}</td>
+                    <td><a href="{{event.image}}}">full image</a></td>
                     <td class="text-right">
                         <button class="btn btn-default"
-                                data-creatureweight="50"
-                                data-foodlevel="75"
-                                data-waterlevel="10"
+                                data-creatureweight="{{event.creatureweight}}"
+                                data-foodlevel="{{event.foodlevel}}"
+                                data-waterlevel="{{event.waterlevel}}"
                                 data-toggle="modal"
                                 data-target="#eventModal">Sensors</button>
                     </td>
 
                 </tr>
-                
-                <tr>
-                    <td><img class="media-object" src="..." alt="..."></td>
-                    <td>25/09/17 22:16:46</td>
-                    <td>123abc</td>
-                    <td><a href="e423aa4a-31c7-41cd-bec6-7f8fe2f6ee10.jpg}">full image</a></td>
-                    <td class="text-right">
-                        <button class="btn btn-default"
-                                data-creatureweight="100"
-                                data-foodlevel="100"
-                                data-waterlevel="100"
-                                data-toggle="modal"
-                                data-target="#eventModal">Sensors</button>
-                    </td>
-
-                </tr>
-                
+                {% endfor %}
                 </tbody>  
               </table>
           </section>
@@ -147,6 +131,7 @@
 
 </body>
 </html>
+
 
 
 

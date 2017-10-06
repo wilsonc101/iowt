@@ -22,15 +22,15 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">{{ icon_path }}</a>
+      <a class="navbar-brand" href="#"></a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-right">
-        {% if isadmin %}
+        
           <li><a href="admin.html">Admin</a></li>
-        {% endif %}
+        
         <li><a href="sightings.html">Sightings</a></li>
         <li class="active"><a href="#">My Things</a></li>
       </ul>
@@ -58,28 +58,41 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for device in devices %}
+                
                 <tr>
-                    <td>{{device.id}}</td>
-                    <td><em>{{device.name}}</em></td>
-                    <td><em>{{device.location}}</em></td>
-                    {% if device.status == "online" %}
-                        <td class="success">{{device.status}}</td>
-                    {% elif device.status == "offline" %}
-                        <td class="danger">{{device.status}}</td>
-                    {% else %}
-                        <td class="warning">{{device.status}}</td>
-                    {% endif %}
+                    <td>890xyz</td>
+                    <td><em>Outside2</em></td>
+                    <td><em>In the front garden</em></td>
+                    
+                        <td class="danger">offline</td>
+                    
                     <td class="text-right">
                         <button class="btn btn-default"  
-                                data-deviceid="{{device.id}}"
-                                data-devicename="{{device.name}}"
-                                data-devicelocation="{{device.location}}"
+                                data-deviceid="890xyz"
+                                data-devicename="Outside2"
+                                data-devicelocation="In the front garden"
                                 data-toggle="modal" 
                                 data-target="#myModal">Edit</button>
                     </td>
                 </tr>
-                {% endfor %}  
+                
+                <tr>
+                    <td>123abc</td>
+                    <td><em>Outside1</em></td>
+                    <td><em>In the front garden</em></td>
+                    
+                        <td class="success">online</td>
+                    
+                    <td class="text-right">
+                        <button class="btn btn-default"  
+                                data-deviceid="123abc"
+                                data-devicename="Outside1"
+                                data-devicelocation="In the front garden"
+                                data-toggle="modal" 
+                                data-target="#myModal">Edit</button>
+                    </td>
+                </tr>
+                  
 
               </tbody>  
               </table>
