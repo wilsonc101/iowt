@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link href="css/bootstrap.min.css" rel="stylesheet">
-  <link href="css/sb-admin.min.css" rel="stylesheet">
+  <link href="css/iowt.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
   <script src="scripts/bootstrap.min.js"></script>
@@ -28,7 +28,10 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-right">
-        <li class="active"><a href="#">Sightings</a></li>
+        {% if isadmin %}
+          <li class="active"><a href="#">Admin</a></li>
+        {% endif %}
+        <li><a href="sightings.html">Sightings</a></li>
         <li><a href="mythings.html">My Things</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
@@ -39,7 +42,7 @@
   <div class="container-fluid">
       <div class="row">
           <aside class="col-sm-12">
-              <h3>Sightings</h3>
+              <h3>All Things</h3>
           </aside>
       </div>
       <div class="row">
@@ -47,34 +50,41 @@
               <table class="table table-hover">
                 <thead>
                 <tr>
+                  <th>ID</th>
+                  <th>Owner</th>    
+                  <th>Status</th>
                   <th> </th>
-                  <th>Time/Date</th>
-                  <th>Device</th>
-                  <th>Image</th>
                 </tr>
                 </thead>
                 <tbody>
+                {% for device in devices %}
                 <tr>
-                    <td><img class="media-object" src="..." alt="..."></td>
-                    <td>1</td>
-                    <td>B</td>
-                    <td>!</td>
+                    <td>{{device.id}}</td>
+                    <td><em>{{device.owner}}</em></td>
+                    {% if device.status == "online" %}
+                        <td class="success">{{device.status}}</td>
+                    {% elif device.status == "offline" %}
+                        <td class="danger">{{device.status}}</td>
+                    {% else %}
+                        <td class="warning">{{device.status}}</td>
+                    {% endif %}
+                    <td class="text-right">
+                        <button class="btn btn-default">Set Owner</button>
+                        <button class="btn btn-default">Re-Key</button>
+                        <button class="btn btn-default">Disable</button>
+                        <button class="btn btn-default">Delete</button>
+                    </td>
                 </tr>
-                <tr>
-                    <td><img class="media-object" src="..." alt="..."></td>
-                    <td>1</td>
-                    <td>B</td>
-                    <td>!</td>
-                </tr>
-                <tr>
-                    <td><img class="media-object" src="..." alt="..."></td>
-                    <td>1</td>
-                    <td>B</td>
-                    <td>!</td>
-                </tr>
-                </tbody>  
+                {% endfor %}  
+
+              </tbody>  
               </table>
           </section>
       </div>
   </div>
+   
+<script src="scripts/iowt.js"></script>
+
+    
 </body>
+</html>

@@ -30,6 +30,22 @@ def render_s3_template(client, bucket, template_name, content=None):
     return(rendered_html)
 
 
+
+
+# Admin - Loop through devices
+things = list()
+response = ddb_device_table.scan()
+for item in response['Items']:
+    things.append(item)
+
+with open("s3/admin.html", "w") as html_file:
+    file_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                      "admin.tmpl",
+                                      {"devices": things,
+                                       "isadmin": isAdmin})
+    html_file.write(file_content)
+
+
 # Loop through devices and pick all tagged with 'owner'
 things = list()
 response = ddb_device_table.scan(FilterExpression=Attr('owner').eq(owner))
