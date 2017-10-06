@@ -17,6 +17,8 @@ owner = "chrisw"
 
 isAdmin = True
 
+api_url = "http://localhost:8000"
+
 
 def render_s3_template(client, bucket, template_name, content=None):
     # If no conent is supplied, set to empty dict
@@ -28,7 +30,6 @@ def render_s3_template(client, bucket, template_name, content=None):
     rendered_html = jinja2.Environment().from_string(file_content).render(content)
 
     return(rendered_html)
-
 
 
 
@@ -56,17 +57,19 @@ with open("s3/mythings.html", "w") as html_file:
     file_content = render_s3_template(S3_CLIENT, s3_bucket,
                                       "mythings.tmpl",
                                       {"devices": things,
-                                       "isadmin": isAdmin})
+                                       "isadmin": isAdmin,
+                                       "apiurl": api_url})
     html_file.write(file_content)
 
 
-events = list()
 # loop devices and get events
+events = list()
 for thing in things:
     response = ddb_event_table.scan(FilterExpression=Attr('device_id').eq(thing['id']))
     if len(response['Items']) > 0:
         for event in response['Items']:
             event_data = dict()
+            event_data['id'] = event['id']
             event_data['timestamp'] = event['timestamp']
             event_data['device_id'] = event['device_id']
             event_data['image'] = event['image_id']
@@ -81,5 +84,6 @@ with open("s3/sightings.html", "w") as html_file:
     file_content = render_s3_template(S3_CLIENT, s3_bucket,
                                       "sightings.tmpl",
                                      {"events": events,
-                                      "isadmin": isAdmin})
+                                      "isadmin": isAdmin,
+                                      "apiurl": api_url})
     html_file.write(file_content)

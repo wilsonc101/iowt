@@ -12,9 +12,22 @@ $('#myModal').on('show.bs.modal', function(e) {
 });
 
 function save_device_data() {
-  $select_value = $("#deviceLocation").val();
-  console.log($select_value);
+  var deviceId = $("#deviceId").val();
+  var deviceLocation = $("#deviceLocation").val();
+  var deviceName = $("#deviceName").val();
+  var apiUrl = $("#apiUrl").val();
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, true);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"device-id":deviceId,
+                             "device-name":deviceName, 
+                             "device-location":deviceLocation, 
+                             "action":"update"}));
+
   $('#myModal').modal('hide');
+  location.reload();
+
 };
 
 
@@ -33,4 +46,48 @@ $('#eventModal').on('show.bs.modal', function(e) {
 });
 
 
+function event_delete(button) {
+  var eventId = $(button).data("eventid");
+  var apiUrl = $(button).data("url");
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, true);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"eventid":eventId, "action":"delete"}));
+  location.reload();
+
+};
+
+function device_delete(button) {
+  var deviceId = $(button).data("deviceid");
+  var apiUrl = $(button).data("url");
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, true);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"deviceid":deviceId, "action":"delete"}));
+  location.reload();
+
+};
+
+function device_disable(button) {
+  var deviceId = $(button).data("deviceid");
+  var apiUrl = $(button).data("url");
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, true);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"deviceid":deviceId, "action":"disable"}));
+  location.reload();
+
+};
+
+
+$('#imageModal').on('show.bs.modal', function(e) {
+  var image = e.relatedTarget.dataset.image;
+
+  var eventImage = document.getElementById("full-image");
+  eventImage.alt = image;
+  eventImage.src = "https://robotika.co.uk/robotika.png";
+});
 

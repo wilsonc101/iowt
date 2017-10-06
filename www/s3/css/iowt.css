@@ -18,3 +18,9 @@ body {
 .table > tbody > tr > td > .progress {
     margin-bottom: 0px !important;
 }
+
+.modal-body > .img-responsive {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

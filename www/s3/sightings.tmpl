@@ -63,7 +63,11 @@
                     <td><img class="media-object" src="..." alt="..."></td>
                     <td>{{event.timestamp}}</td>
                     <td>{{event.device_id}}</td>
-                    <td><a href="{{event.image}}}">full image</a></td>
+                    <td><button class="btn btn-primary" 
+                                data-image={{event.image}}
+                                data-toggle="modal"
+                                data-target="#imageModal">Full Image</button>
+                    </td>
                     <td class="text-right">
                         <button class="btn btn-default"
                                 data-creatureweight="{{event.creatureweight}}"
@@ -71,6 +75,8 @@
                                 data-waterlevel="{{event.waterlevel}}"
                                 data-toggle="modal"
                                 data-target="#eventModal">Sensors</button>
+                        <button class="btn btn-default" id="event-delete" data-url="{{apiurl}}" data-eventid="{{event.id}}" onclick="event_delete(this);">Delete</button>
+
                     </td>
 
                 </tr>
@@ -123,6 +129,21 @@
     </div>
   </div>
 </div>
+
+<div class="modal fade bs-example-modal-lg" id="imageModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <img class="img-responsive" id="full-image" alt="Embedded Image" src="...">
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 
 
