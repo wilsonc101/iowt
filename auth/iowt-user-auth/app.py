@@ -242,7 +242,7 @@ def auth_in():
     try:
         login_form = render_s3_template(s3_client,
                                         s3_bucket,
-                                        "form_login.tmpl",
+                                        "login.tmpl",
                                         {"csspath": default_css})
 
         new_password_form = render_s3_template(s3_client,
@@ -274,17 +274,17 @@ def auth_in():
 
         login_form = render_s3_template(s3_client,
                                         s3_bucket,
-                                        "form_login.tmpl",
+                                        "login.tmpl",
                                         content)
 
         new_password_form = render_s3_template(s3_client,
                                                s3_bucket,
-                                               "form_newpassword.tmpl",
+                                               "newpassword.tmpl",
                                                content)
 
         reset_password_form = render_s3_template(s3_client,
                                                  s3_bucket,
-                                                 "form_passwordreset.tmpl",
+                                                 "passwordreset.tmpl",
                                                  content)
 
         login_success = render_s3_template(s3_client,

@@ -27,13 +27,22 @@
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav navbar-right">
+      <ul class="nav navbar-nav navbar-left">
         {% if isadmin %}
           <li class="active"><a href="#">Admin</a></li>
         {% endif %}
         <li><a href="sightings.html">Sightings</a></li>
         <li><a href="mythings.html">My Things</a></li>
       </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <p class="navbar-btn">
+            <a href="login.html" class="btn btn-default">Sign in</a>
+          </p>
+        </li>
+      </ul>
+
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
   </nav>

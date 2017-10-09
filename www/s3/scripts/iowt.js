@@ -30,7 +30,6 @@ function save_device_data() {
 
 };
 
-
 $('#eventModal').on('show.bs.modal', function(e) {
   var creatureWeight = e.relatedTarget.dataset.creatureweight;
   var foodLevel = e.relatedTarget.dataset.foodlevel;
@@ -44,7 +43,6 @@ $('#eventModal').on('show.bs.modal', function(e) {
   var waterBar = document.getElementById("progbar-water");
   waterBar.style.width = waterLevel.concat("%");
 });
-
 
 function event_delete(button) {
   var eventId = $(button).data("eventid");
@@ -81,7 +79,6 @@ function device_disable(button) {
   location.reload();
 
 };
-
 
 $('#imageModal').on('show.bs.modal', function(e) {
   var image = e.relatedTarget.dataset.image;

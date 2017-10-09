@@ -27,13 +27,23 @@
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav navbar-right">
+      <ul class="nav navbar-nav navbar-left">
         {% if isadmin %}
           <li><a href="admin.html">Admin</a></li>
         {% endif %}
         <li><a href="sightings.html">Sightings</a></li>
         <li class="active"><a href="#">My Things</a></li>
       </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <p class="navbar-btn">
+            <a href="login.html" class="btn btn-default">Sign in</a>
+          </p>
+        </li>
+      </ul>
+
+
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
   </nav>
@@ -76,7 +86,7 @@
                                 data-devicename="{{device.name}}"
                                 data-devicelocation="{{device.location}}"
                                 data-toggle="modal" 
-                                data-target="#myModal">Edit</button>
+                                data-target="#thingModal">Edit</button>
                     </td>
                 </tr>
                 {% endfor %}  
@@ -88,12 +98,12 @@
   </div>
 
 <!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="thingModal" tabindex="-1" role="dialog" aria-labelledby="thingModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Thing Details</h4>
+        <h4 class="modal-title" id="thingModalLabel">Thing Details</h4>
       </div>
       <div class="modal-body">
         <div class="input-group">

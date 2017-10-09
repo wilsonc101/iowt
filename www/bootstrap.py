@@ -43,7 +43,8 @@ with open("s3/admin.html", "w") as html_file:
     file_content = render_s3_template(S3_CLIENT, s3_bucket,
                                       "admin.tmpl",
                                       {"devices": things,
-                                       "isadmin": isAdmin})
+                                       "isadmin": isAdmin,
+                                       "icon_path": "Things"})
     html_file.write(file_content)
 
 
@@ -58,7 +59,8 @@ with open("s3/mythings.html", "w") as html_file:
                                       "mythings.tmpl",
                                       {"devices": things,
                                        "isadmin": isAdmin,
-                                       "apiurl": api_url})
+                                       "apiurl": api_url,
+                                       "icon_path": "Things"})
     html_file.write(file_content)
 
 
@@ -85,5 +87,39 @@ with open("s3/sightings.html", "w") as html_file:
                                       "sightings.tmpl",
                                      {"events": events,
                                       "isadmin": isAdmin,
-                                      "apiurl": api_url})
+                                      "apiurl": api_url,
+                                      "icon_path": "Things"})
     html_file.write(file_content)
+
+
+# Login page
+with open("s3/login.html", "w") as html_file:
+    file_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                      "login.tmpl",
+                                      {"icon_path": "Things"})
+    html_file.write(file_content)
+
+
+# Login Success page
+with open("s3/loginsuccess.html", "w") as html_file:
+    file_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                      "loginsuccess.tmpl",
+                                      {"icon_path": "Things",
+                                       "username": owner})
+    html_file.write(file_content)
+
+
+# New Password page
+with open("s3/loginnewpassword.html", "w") as html_file:
+    file_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                      "loginnewpassword.tmpl",
+                                      {"icon_path": "Things"})
+    html_file.write(file_content)
+
+#Password reset page
+with open("s3/loginpasswordreset.html", "w") as html_file:
+    file_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                      "loginpasswordreset.tmpl",
+                                      {"icon_path": "Things"})
+    html_file.write(file_content)
+

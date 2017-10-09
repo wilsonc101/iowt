@@ -82,7 +82,11 @@ def index():
 
         # Reject request if no user data avaliable
         if not user_data:
-            return Response(body="Please login to access mapping",
+            html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                              "login.tmpl",
+                                              {"icon_path":"Things"})
+
+            return Response(body=html_content,
                             status_code=200,
                             headers=default_header)
 
