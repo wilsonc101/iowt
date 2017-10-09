@@ -28,6 +28,8 @@ s3_client = boto3.client('s3', region_name="eu-west-1")
 s3_bucket = os.environ['s3bucket']
 pub_bucket_url = os.environ['pubbucketurl']
 
+icon_path = os.environ['logopath']
+
 tomorrow = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%a, %d %b %Y %H:%M:%S GMT")
 yesterday = (datetime.datetime.now() + datetime.timedelta(days=-1)).strftime("%a, %d %b %Y %H:%M:%S GMT")
 default_header = {'Content-Type': 'text/html',
@@ -223,7 +225,7 @@ def auth_form():
     try:
         login_form = render_s3_template(s3_client,
                                         s3_bucket,
-                                        "form_login.tmpl",
+                                        "login.tmpl",
                                         {"csspath": default_css})
         return Response(body=login_form,
                         status_code=200,
@@ -240,26 +242,6 @@ def auth_form():
            content_types=['application/x-www-form-urlencoded'])
 def auth_in():
     try:
-        login_form = render_s3_template(s3_client,
-                                        s3_bucket,
-                                        "login.tmpl",
-                                        {"csspath": default_css})
-
-        new_password_form = render_s3_template(s3_client,
-                                               s3_bucket,
-                                               "form_newpassword.tmpl",
-                                               {"csspath": default_css})
-
-        reset_password_form = render_s3_template(s3_client,
-                                                 s3_bucket,
-                                                 "form_passwordreset.tmpl",
-                                                 {"csspath": default_css})
-
-        login_success = render_s3_template(s3_client,
-                                           s3_bucket,
-                                           "loginsuccess.tmpl",
-                                           {"csspath": default_css})
-
         parsed = urlparse.parse_qs(app.current_request.raw_body)
         username = parsed['username'][0]
         password = parsed['password'][0]
@@ -270,7 +252,9 @@ def auth_in():
         auth_params['AuthParameters']['USERNAME'] = username
         auth_params['AuthParameters']['PASSWORD'] = password
 
-        content = {"csspath": default_css}
+        content = {"csspath": default_css,
+                   "icon_path": icon_path,
+                   "username":username}
 
         login_form = render_s3_template(s3_client,
                                         s3_bucket,
@@ -279,12 +263,12 @@ def auth_in():
 
         new_password_form = render_s3_template(s3_client,
                                                s3_bucket,
-                                               "newpassword.tmpl",
+                                               "loginnewpassword.tmpl",
                                                content)
 
         reset_password_form = render_s3_template(s3_client,
                                                  s3_bucket,
-                                                 "passwordreset.tmpl",
+                                                 "loginpasswordreset.tmpl",
                                                  content)
 
         login_success = render_s3_template(s3_client,
@@ -368,7 +352,7 @@ def auth_in():
 
             login_form = render_s3_template(s3_client,
                                             s3_bucket,
-                                            "form_login.tmpl",
+                                            "login.tmpl",
                                             content)
 
             return Response(body=login_form,
@@ -379,7 +363,7 @@ def auth_in():
         content['error_message'] = "Sorry, something went wrong. Please try again<br><br>" + str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1])
         login_form = render_s3_template(s3_client,
                                         s3_bucket,
-                                        "form_login.tmpl",
+                                        "login.tmpl",
                                         content)
 
         return Response(body=login_form,
@@ -390,7 +374,8 @@ def auth_in():
 @app.route('/newpass', methods=['POST'],
            content_types=['application/x-www-form-urlencoded'])
 def auth_new_password():
-    content = {"csspath": default_css}
+    content = {"csspath": default_css,
+               "icon_path": icon_path}
     try:
         # Extract cookie data
         cookie_data = app.current_request.headers['cookie']
@@ -401,6 +386,7 @@ def auth_new_password():
                 access_token = cookie_content
             elif cookie_name == "username":
                 username = cookie_content
+                content['username'] = username
             elif cookie_name == "session":
                 session_id = cookie_content
 
@@ -446,7 +432,7 @@ def auth_new_password():
             content['error_message'] = "Sorry, something went wrong. Please try again<br><br>" + str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]) + "<br><hr>" + str(login_response)
             login_form = render_s3_template(s3_client,
                                             s3_bucket,
-                                            "form_login.tmpl",
+                                            "login.tmpl",
                                             content)
 
             return Response(body=login_form,
@@ -457,7 +443,7 @@ def auth_new_password():
         content['error_message'] = "Sorry, something went wrong. Please try again<br><br>" + str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1])
         login_form = render_s3_template(s3_client,
                                         s3_bucket,
-                                        "form_login.tmpl",
+                                        "login.tmpl",
                                         content)
 
         return Response(body=login_form,
@@ -469,7 +455,8 @@ def auth_new_password():
            methods=['POST'],
            content_types=['application/x-www-form-urlencoded'])
 def auth_reset_password():
-    content = {"csspath": default_css}
+    content = {"csspath": default_css,
+               "icon_path": icon_path}
     try:
         # Extract cookie data
         cookie_data = app.current_request.headers['cookie']
@@ -493,9 +480,9 @@ def auth_reset_password():
         assert response, "error reseting password"
 
         content['error_message'] = "Your password has been reset."
-        login_form = render_s3_template(s3_client, 
-                                        s3_bucket, 
-                                        "form_login.tmpl", 
+        login_form = render_s3_template(s3_client,
+                                        s3_bucket,
+                                        "login.tmpl",
                                         content)
 
         return Response(body=login_form,
@@ -506,7 +493,7 @@ def auth_reset_password():
         content['error_message'] = "Sorry, something went wrong. Please try again<br><br>" + str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1])
         login_form = render_s3_template(s3_client,
                                         s3_bucket,
-                                        "form_login.tmpl",
+                                        "login.tmpl",
                                         content)
 
         return Response(body=login_form,
@@ -516,8 +503,8 @@ def auth_reset_password():
 
 @app.route('/read')
 def read_cookie():
-    content = dict()
-    content['csspath'] = default_css
+    content = {"csspath": default_css,
+               "icon_path": icon_path}
 
     try:
         cookie_data = app.current_request.headers['cookie']
@@ -576,7 +563,7 @@ def read_cookie():
 
         login_form = render_s3_template(s3_client,
                                         s3_bucket,
-                                        "form_login.tmpl",
+                                        "login.tmpl",
                                         content)
 
         return Response(body=login_form,

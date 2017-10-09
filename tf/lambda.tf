@@ -19,6 +19,7 @@ resource "aws_lambda_function" "iowt-user-auth" {
       cogpoolid = "${var.cognito_pool_id}"
       cogappid = "${var.cognito_app_id}"
       cogattrib = "attrib1"
+      logopath = "Things"      
     }
   }
 
@@ -41,6 +42,7 @@ resource "aws_lambda_function" "iowt-api-auth" {
       cogpoolid = "${var.cognito_pool_id}"
       cogappid = "${var.cognito_app_id}"
       cogattrib = "attrib1"
+      logopath = "Things"      
     }
   }
 
@@ -54,7 +56,7 @@ resource "aws_lambda_function" "iowt-www" {
   handler          = "app.app"
   runtime          = "python3.6"
   source_code_hash = "${base64sha256(file("build_files/iowt-www.zip"))}"
-  timeout          = "8"
+  timeout          = "20"
   environment {
     variables = {
       bucket = "iowt",
@@ -62,6 +64,7 @@ resource "aws_lambda_function" "iowt-www" {
       loginurl = "https://api.iowt.robotika.co.uk/token/validatetoken",
       event_bucket = "iowt-events",
       ddbtable = "iowt-events"
+      logopath = "Things"      
     }
   }
 
