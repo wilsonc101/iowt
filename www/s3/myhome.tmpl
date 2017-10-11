@@ -5,6 +5,7 @@
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/iowt.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
   <script src="scripts/bootstrap.min.js"></script>
     
@@ -29,7 +30,7 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-left">
         {% if isadmin %}
-          <li class="active"><a href="#">Admin</a></li>
+          <li><a href="admin.html">Admin</a></li>
         {% endif %}
         <li><a href="sightings.html">Sightings</a></li>
         <li><a href="mythings.html">My Things</a></li>
@@ -44,60 +45,52 @@
             <li><a href="#">Sign Out</a></li>
           </ul>
         </li>
+
       </ul>
 
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
   </nav>
   <!-- </div> -->
-    
   <div class="container-fluid">
-      <div class="row">
-          <aside class="col-sm-12">
-              <h3>All Things</h3>
-          </aside>
-      </div>
-      <div class="row">
-        <section class="col-sm-12">
-              <table class="table table-hover">
-                <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Owner</th>    
-                  <th>Status</th>
-                  <th> </th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for device in devices %}
-                <tr>
-                    <td>{{device.id}}</td>
-                    <td><em>{{device.owner}}</em></td>
-                    {% if device.status == "online" %}
-                        <td class="success">{{device.status}}</td>
-                    {% elif device.status == "offline" %}
-                        <td class="danger">{{device.status}}</td>
-                    {% else %}
-                        <td class="warning">{{device.status}}</td>
-                    {% endif %}
-                    <td class="text-right">
-                        <button class="btn btn-default">Set Owner</button>
-                        <button class="btn btn-default">Re-Key</button>
-                        <button class="btn btn-default" id="device-disable" data-url="{{apiurl}}" data-deviceid="{{device.id}}" onclick="device_disable(this);">Disable</button>
-                        <button class="btn btn-default" id="device-delete" data-url="{{apiurl}}" data-deviceid="{{device.id}}" onclick="device_delete(this);">Delete</button>
+    <div class="row">
+      <aside class="col-sm-4">
+      </aside>
 
-                    </td>
-                </tr>
-                {% endfor %}  
+      <section class="col-sm-4">
+            <div class="row alert alert-info">
+              <div class="col-sm-1">
+                <h2><span class="fa fa-camera" aria-hidden="true"></span></h2>
+              </div>
+              <div class="col-sm-9 text-center">
+                <h2><a class="alert-link" href="sightings.html"><strong>Sightings</strong></a></h2>
+              </div>
+              <div class="col-sm-2">
+                <h3><span class="label label-info">{{sightingscount}}</span></h3>
+              </div>
+           </div>
+           <div class="row alert alert-warning">
+              <div class="col-sm-1">
+                <h2><span class="fa fa-microchip" aria-hidden="true"></span></h2>
+              </div>
+              <div class="col-sm-9 text-center">
+                <h2><a class="alert-link" href="mythings.html"><strong>My Things</strong></a></h2>
+              </div>
+              <div class="col-sm-2">
+                {% if mythingwarning %}
+                  <h3><span class="label label-danger"><i class="fa fa-exclamation" aria-hidden="true"></i></span></h3>
+                {% endif %}
+            </div>
+          </div>
+      </section>
 
-              </tbody>  
-              </table>
-          </section>
-      </div>
+      <aside class="col-sm-4">
+      </aside>
+
+    </div>
   </div>
-   
+
 <script src="scripts/iowt.js"></script>
 
-    
 </body>
 </html>

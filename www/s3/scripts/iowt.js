@@ -1,4 +1,4 @@
-$('#myModal').on('show.bs.modal', function(e) {
+$('#thingModal').on('show.bs.modal', function(e) {
   var deviceId = e.relatedTarget.dataset.deviceid;
   var deviceName = e.relatedTarget.dataset.devicename;
   var deviceLocation = e.relatedTarget.dataset.devicelocation;
@@ -25,7 +25,7 @@ function save_device_data() {
                              "device-location":deviceLocation, 
                              "action":"update"}));
 
-  $('#myModal').modal('hide');
+  $('#thingModal').modal('hide');
   location.reload();
 
 };

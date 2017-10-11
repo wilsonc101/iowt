@@ -44,7 +44,8 @@ with open("s3/admin.html", "w") as html_file:
                                       "admin.tmpl",
                                       {"devices": things,
                                        "isadmin": isAdmin,
-                                       "icon_path": "Things"})
+                                       "icon_path": "Things",
+                                       "username": owner})
     html_file.write(file_content)
 
 
@@ -60,7 +61,8 @@ with open("s3/mythings.html", "w") as html_file:
                                       {"devices": things,
                                        "isadmin": isAdmin,
                                        "apiurl": api_url,
-                                       "icon_path": "Things"})
+                                       "icon_path": "Things",
+                                       "username": owner})
     html_file.write(file_content)
 
 
@@ -68,6 +70,7 @@ with open("s3/mythings.html", "w") as html_file:
 events = list()
 for thing in things:
     response = ddb_event_table.scan(FilterExpression=Attr('device_id').eq(thing['id']))
+    events_count = len(response['Items'])
     if len(response['Items']) > 0:
         for event in response['Items']:
             event_data = dict()
@@ -88,7 +91,8 @@ with open("s3/sightings.html", "w") as html_file:
                                      {"events": events,
                                       "isadmin": isAdmin,
                                       "apiurl": api_url,
-                                      "icon_path": "Things"})
+                                      "icon_path": "Things",
+                                      "username": owner})
     html_file.write(file_content)
 
 
@@ -123,3 +127,15 @@ with open("s3/loginpasswordreset.html", "w") as html_file:
                                       {"icon_path": "Things"})
     html_file.write(file_content)
 
+#Password reset page
+with open("s3/myhome.html", "w") as html_file:
+    file_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                      "myhome.tmpl",
+                                      {"icon_path": "Things",
+                                       "isadmin": isAdmin,
+                                       "username": owner,
+                                       "sightingscount": events_count,
+                                       "mythingwarning":True})
+    html_file.write(file_content)
+
+print(events_count)
