@@ -40,7 +40,7 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{username}}<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="settings.html">Settings</a></li>
+            <li><a class="active" href="#">Settings</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="#">Sign Out</a></li>
           </ul>
@@ -57,31 +57,40 @@
       <aside class="col-sm-4">
       </aside>
 
+
       <section class="col-sm-4">
-            <div class="row alert alert-info">
-              <div class="col-sm-1">
-                <h2><span class="fa fa-camera" aria-hidden="true"></span></h2>
-              </div>
-              <div class="col-sm-9 text-center">
-                <h2><a class="alert-link" href="sightings.html"><strong>Sightings</strong></a></h2>
-              </div>
-              <div class="col-sm-2">
-                <h3><span class="label label-info">{{sightingscount}}</span></h3>
-              </div>
-           </div>
-           <div class="row alert alert-warning">
-              <div class="col-sm-1">
-                <h2><span class="fa fa-microchip" aria-hidden="true"></span></h2>
-              </div>
-              <div class="col-sm-9 text-center">
-                <h2><a class="alert-link" href="mythings.html"><strong>My Things</strong></a></h2>
-              </div>
-              <div class="col-sm-2">
-                {% if mythingwarning %}
-                  <h3><span class="label label-danger"><i class="fa fa-exclamation" aria-hidden="true"></i></span></h3>
-                {% endif %}
+
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <form class="form-horizontal">
+
+          <div class="form-group">
+            <label for="inputUsername" class="col-sm-2 control-label text-left">Username</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="inputUsername" placeholder="{{username}}" readonly>
             </div>
           </div>
+
+
+          <div class="form-group">
+            <label for="inputEmail" class="col-sm-2 control-label text-left">Email</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="inputEmail" placeholder="test@test.test">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputPassword" class="col-sm-2 control-label text-left">Password</label>
+            <div class="col-sm-10">
+              <input type="password" class="form-control" id="inputPassword" placeholder="New Password">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" onclick="save_user_settings(this);">Submit</button>
+        </form>
+      </div>
+    </div>
+
+
       </section>
 
       <aside class="col-sm-4">

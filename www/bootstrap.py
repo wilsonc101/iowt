@@ -14,7 +14,7 @@ ddb_event_table = DDB_RESOURCE.Table(ddb_event_table_name)
 s3_bucket = "iowt"
 
 owner = "chrisw"
-
+email_address = "test@test.test"
 isAdmin = True
 
 api_url = "http://localhost:8000"
@@ -139,3 +139,13 @@ with open("s3/myhome.html", "w") as html_file:
     html_file.write(file_content)
 
 print(events_count)
+
+#Settings page
+with open("s3/settings.html", "w") as html_file:
+    file_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                      "settings.tmpl",
+                                      {"icon_path": "Things",
+                                       "isadmin": isAdmin,
+                                       "username": owner,
+                                       "current_email_address": email_address})
+    html_file.write(file_content)

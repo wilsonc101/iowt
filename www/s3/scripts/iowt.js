@@ -80,6 +80,23 @@ function device_disable(button) {
 
 };
 
+function save_user_settings(button) {
+  var newPassword = $("#inputPassword").val();
+  var newEmail = $("#inputEmail").val();
+
+  console.log(newPassword);
+  console.log("here");
+
+//  var xhttp = new XMLHttpRequest();
+//  xhttp.open("POST", apiUrl, true);
+// xhttp.setRequestHeader('Content-type', 'application/json');
+//  xhttp.send(JSON.stringify({"newpassword":newPassword, "newEmail":newEmail, "action":"update"}));
+//  location.reload();
+
+};
+
+
+
 $('#imageModal').on('show.bs.modal', function(e) {
   var image = e.relatedTarget.dataset.image;
 
