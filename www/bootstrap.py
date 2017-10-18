@@ -120,14 +120,14 @@ with open("s3/loginnewpassword.html", "w") as html_file:
                                       {"icon_path": "Things"})
     html_file.write(file_content)
 
-#Password reset page
+# Password reset page
 with open("s3/loginpasswordreset.html", "w") as html_file:
     file_content = render_s3_template(S3_CLIENT, s3_bucket,
                                       "loginpasswordreset.tmpl",
                                       {"icon_path": "Things"})
     html_file.write(file_content)
 
-#Password reset page
+# Myhome reset page
 with open("s3/myhome.html", "w") as html_file:
     file_content = render_s3_template(S3_CLIENT, s3_bucket,
                                       "myhome.tmpl",
@@ -140,7 +140,7 @@ with open("s3/myhome.html", "w") as html_file:
 
 print(events_count)
 
-#Settings page
+# Settings page
 with open("s3/settings.html", "w") as html_file:
     file_content = render_s3_template(S3_CLIENT, s3_bucket,
                                       "settings.tmpl",

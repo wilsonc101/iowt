@@ -2,6 +2,7 @@ import base64
 import copy
 import botocore
 import boto3
+from boto3.dynamodb.conditions import Key, Attr
 import jinja2
 import sys
 import json
@@ -15,7 +16,10 @@ app = Chalice(app_name='iowt-www')
 S3_CLIENT = boto3.client('s3', region_name="eu-west-1")
 IDP_CLIENT = boto3.client('cognito-idp')
 DDB_CLIENT = boto3.client('dynamodb')
+DDB_RESOURCE = boto3.resource('dynamodb')
 
+
+icon_path = "Things"
 default_header = {'Content-Type': 'text/html; charset=UTF-8'}
 
 def render_s3_template(client, bucket, template_name, content=None):
@@ -69,12 +73,50 @@ def get_user_data(headers):
         return False
 
 
+def get_user_things(username, table_name):
+    ddb_table = DDB_RESOURCE.Table(table_name)
+    response = ddb_table.scan(FilterExpression=Attr('owner').eq(username))
+
+    things = list()
+    for item in response['Items']:
+        things.append(item)
+
+    return things
+
+
+def get_user_sightings(username, things, table_name):
+    ddb_table = DDB_RESOURCE.Table(table_name)
+    events = list()
+
+    for thing in things:
+        response = ddb_table.scan(FilterExpression=Attr('device_id').eq(thing['id']))
+        events_count = len(response['Items'])
+
+        if events_count > 0:
+            for event in response['Items']:
+                event_data = dict()
+                event_data['id'] = event['id']
+                event_data['timestamp'] = event['timestamp']
+                event_data['device_id'] = event['device_id']
+                event_data['image'] = event['image_id']
+
+                event_data['creatureweight'] = str(event['creature_weight'])
+                event_data['foodlevel'] = str(event['food_level'])
+                event_data['waterlevel'] = str(event['water_level'])
+
+                events.append(event_data)
+
+    return events 
+
+
 @app.route('/',
            methods=['GET'])
 def index():
     s3_bucket = os.environ['bucket']
     pub_bucket_url = os.environ['pubbucketurl']
-    default_css = pub_bucket_url + "style.css"
+    token_validation_url = os.environ['loginurl']
+    iowt_device_table = os.environ['iowt_device_table']
+    iowt_events_table = os.environ['iowt_events_table']
 
 
     try:
@@ -84,19 +126,33 @@ def index():
         if not user_data:
             html_content = render_s3_template(S3_CLIENT, s3_bucket,
                                               "login.tmpl",
-                                              {"icon_path":"Things"})
+                                              {"icon_path":icon_path})
 
             return Response(body=html_content,
                             status_code=200,
                             headers=default_header)
 
+        #####
         content = dict()
         content['username'] = user_data['username']
-        content['is_admin'] = user_data['is_admin']
-        content['identifier'] = user_data['identifier']
-        content['csspath'] = default_css
+        content['isadmin'] = user_data['is_admin']
+        content['icon_path'] = icon_path
 
-        html_content = render_s3_template(S3_CLIENT, s3_bucket, "demo.tmpl", content)
+        things = get_user_things(user_data['username'], iowt_device_table)
+
+        mythingwarning = False
+        for thing in things:
+            if thing['status'] != "online":
+                mythingwarning = True
+
+        content['mythingwarning'] = mythingwarning
+
+        sightings = get_user_sightings(user_data['username'], things, iowt_events_table)
+        content['sightingscount'] = len(sightings)
+
+
+        html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                          "myhome.tmpl", content)
 
         return Response(body=html_content,
                         status_code=200,
@@ -106,6 +162,15 @@ def index():
         return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
                         status_code=500,
                         headers=default_header)
+
+
+@app.route('/{pages}',
+           methods=['GET'])
+def showpage(pages):
+    return Response(body=str(pages),
+                    status_code=200,
+                    headers={'Content-Type': 'text/html',
+                             'Access-Control-Allow-Origin': '*'})
 
 
 @app.route('/newevent',
@@ -123,7 +188,7 @@ def event_post():
 
     try:
         s3_bucket = os.environ['event_bucket']
-        ddb_table = os.environ['ddbtable']
+        ddb_table = os.environ['iowt_events_table']
 
         request = app.current_request
         json_data = json.loads(request.raw_body.decode())

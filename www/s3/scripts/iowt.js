@@ -80,7 +80,7 @@ function device_disable(button) {
 
 };
 
-function save_user_settings(button) {
+function save_user_settings() {
   var newPassword = $("#inputPassword").val();
   var newEmail = $("#inputEmail").val();
 
