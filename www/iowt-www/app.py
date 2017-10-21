@@ -8,7 +8,7 @@ import sys
 import json
 import os
 import urllib
-
+import ast
 
 from chalice import Chalice, Response
 app = Chalice(app_name='iowt-www')
@@ -73,9 +73,34 @@ def get_user_data(headers):
         return False
 
 
+def update_device(device_id, device_location, device_name, table_name):
+    ddb_table = DDB_RESOURCE.Table(table_name)
+
+    response = ddb_table.update_item(
+    Key={'id': device_id},
+    UpdateExpression="SET deviceLocation=:value1, deviceName=:value2",
+    ExpressionAttributeValues={
+        ':value1': device_location,
+        ':value2': device_name},
+    ReturnValues="UPDATED_NEW")
+
+    return True
+
+
 def get_user_things(username, table_name):
     ddb_table = DDB_RESOURCE.Table(table_name)
-    response = ddb_table.scan(FilterExpression=Attr('owner').eq(username))
+    response = ddb_table.scan(FilterExpression=Attr('deviceOwner').eq(username))
+
+    things = list()
+    for item in response['Items']:
+        things.append(item)
+
+    return things
+
+
+def get_all_things(table_name):
+    ddb_table = DDB_RESOURCE.Table(table_name)
+    response = ddb_table.scan()
 
     things = list()
     for item in response['Items']:
@@ -106,18 +131,16 @@ def get_user_sightings(username, things, table_name):
 
                 events.append(event_data)
 
-    return events 
+    return events
 
 
 @app.route('/',
            methods=['GET'])
 def index():
     s3_bucket = os.environ['bucket']
-    pub_bucket_url = os.environ['pubbucketurl']
     token_validation_url = os.environ['loginurl']
     iowt_device_table = os.environ['iowt_device_table']
     iowt_events_table = os.environ['iowt_events_table']
-
 
     try:
         user_data = get_user_data(app.current_request.headers)
@@ -142,7 +165,7 @@ def index():
 
         mythingwarning = False
         for thing in things:
-            if thing['status'] != "online":
+            if thing['deviceStatus'] != "online":
                 mythingwarning = True
 
         content['mythingwarning'] = mythingwarning
@@ -158,6 +181,7 @@ def index():
                         status_code=200,
                         headers={'Content-Type': 'text/html',
                                  'Access-Control-Allow-Origin': '*'})
+
     except:
         return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
                         status_code=500,
@@ -165,12 +189,196 @@ def index():
 
 
 @app.route('/{pages}',
-           methods=['GET'])
+           methods=['GET', 'POST'])
 def showpage(pages):
-    return Response(body=str(pages),
-                    status_code=200,
-                    headers={'Content-Type': 'text/html',
-                             'Access-Control-Allow-Origin': '*'})
+    s3_bucket = os.environ['bucket']
+    token_validation_url = os.environ['loginurl']
+    iowt_device_table = os.environ['iowt_device_table']
+    iowt_events_table = os.environ['iowt_events_table']
+    iowt_api_url = os.environ['iowt_api']
+
+    try:
+        user_data = get_user_data(app.current_request.headers)
+
+        # Reject request if no user data avaliable
+        if not user_data:
+            html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                              "login.tmpl",
+                                              {"icon_path":icon_path})
+
+            return Response(body=html_content,
+                            status_code=200,
+                            headers=default_header)
+
+        request = app.current_request
+        # POST - Take incoming posted data (e.g. from forms)
+        if request.method == 'POST':
+            avaliable_pages = {"admin": "admin.tmpl",
+                               "mythings": "mythings.tmpl",
+                               "settings": "settings.tmpl",
+                               "sightings": "sightings.tmpl"}
+
+            # Reject unknown page
+            if pages not in avaliable_pages:
+                return Response(body="Nothing of that name here!",
+                                status_code=404,
+                                headers={'Content-Type': 'text/html',
+                                         'Access-Control-Allow-Origin': '*'})
+
+
+            # mythings
+            if pages == "mythings":
+                 post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
+
+                 resp = update_device(device_id=post_data['device-id'],
+                                      device_location=post_data['device-location'],
+                                      device_name=post_data['device-name'],
+                                      table_name=iowt_device_table)
+
+                 return Response(body=resp,
+                                 status_code=200,
+                                 headers={'Content-Type': 'text/html',
+                                          'Access-Control-Allow-Origin': '*'})
+
+            elif pages == "sightings":
+                 post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
+
+
+
+        # GET - Render page as requested
+        elif request.method == "GET":
+            avaliable_pages = {"admin": "admin.tmpl",
+                               "myhome": "myhome.tmpl",
+                               "mythings": "mythings.tmpl",
+                               "settings": "settings.tmpl",
+                               "sightings": "sightings.tmpl"}
+
+            # Reject unknown page
+            if pages not in avaliable_pages:
+                return Response(body="Nothing of that name here!",
+                                status_code=404,
+                                headers={'Content-Type': 'text/html',
+                                         'Access-Control-Allow-Origin': '*'})
+
+            # mythings
+            if pages == "mythings":
+                things = get_user_things(user_data['username'], iowt_device_table)
+
+                content = dict()
+                content['devices'] = things
+                content['isadmin'] = user_data['is_admin']
+                content['apiurl'] = iowt_api_url + "/" + pages
+                content['icon_path'] = icon_path
+                content['username'] = user_data['username']
+
+                html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                                  avaliable_pages[pages],
+                                                  content)
+
+                return Response(body=html_content,
+                                status_code=200,
+                                headers={'Content-Type': 'text/html',
+                                         'Access-Control-Allow-Origin': '*'})
+
+            # sightings
+            elif pages == "sightings":
+                things = get_user_things(user_data['username'], iowt_device_table)
+                sightings = get_user_sightings(user_data['username'], things, iowt_events_table)
+
+                content = dict()
+                content['icon_path'] = icon_path
+                content['apiurl'] = iowt_api_url + "/" + pages
+                content['isadmin'] = user_data['is_admin']
+                content['username'] = user_data['username']
+                content['events'] = sightings
+
+                html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                                  avaliable_pages[pages],
+                                                  content)
+
+                return Response(body=html_content,
+                                status_code=200,
+                                headers={'Content-Type': 'text/html',
+                                         'Access-Control-Allow-Origin': '*'})
+
+            # admin
+            elif pages == "admin":
+                things = get_all_things(iowt_device_table)
+
+                content = dict()
+                content['icon_path'] = icon_path
+                content['apiurl'] = iowt_api_url + "/" + pages
+                content['isadmin'] = user_data['is_admin']
+                content['username'] = user_data['username']
+                content['devices'] = things
+
+                html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                                  avaliable_pages[pages],
+                                                  content)
+
+                return Response(body=html_content,
+                                status_code=200,
+                                headers={'Content-Type': 'text/html',
+                                         'Access-Control-Allow-Origin': '*'})
+
+            # myhome
+            elif pages == "myhome":
+                content = dict()
+                content['username'] = user_data['username']
+                content['isadmin'] = user_data['is_admin']
+                content['icon_path'] = icon_path
+
+                things = get_user_things(user_data['username'], iowt_device_table)
+                mythingwarning = False
+
+                for thing in things:
+                    if thing['deviceStatus'] != "online":
+                        mythingwarning = True
+
+                content['mythingwarning'] = mythingwarning
+
+                sightings = get_user_sightings(user_data['username'], things, iowt_events_table)
+                content['sightingscount'] = len(sightings)
+
+                html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                                  avaliable_pages[pages],
+                                                  content)
+
+                return Response(body=html_content,
+                                status_code=200,
+                                headers={'Content-Type': 'text/html',
+                                         'Access-Control-Allow-Origin': '*'})
+
+            # settings
+            elif pages == "settings":
+                content = dict()
+                content['icon_path'] = icon_path
+                content['apiurl'] = iowt_api_url + "/" + pages
+                content['isadmin'] = user_data['is_admin']
+                content['username'] = user_data['username']
+                content['current_email_address'] = user_data['email']
+
+                html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                                  avaliable_pages[pages],
+                                                  content)
+
+                return Response(body=html_content,
+                                status_code=200,
+                                headers={'Content-Type': 'text/html',
+                                         'Access-Control-Allow-Origin': '*'})
+
+
+        # Reject unknown method (not that it should get here)
+        else:
+            return Response(body="Nothing of that name here!",
+                            status_code=404,
+                            headers={'Content-Type': 'text/html',
+                                     'Access-Control-Allow-Origin': '*'})
+
+    except:
+        return Response(body=str(sys.exc_info()) + " -- " + str(sys.exc_info()[1]),
+                        status_code=500,
+                        headers=default_header)
 
 
 @app.route('/newevent',

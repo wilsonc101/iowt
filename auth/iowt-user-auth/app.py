@@ -633,6 +633,18 @@ def validate_token():
                 else:
                     response_data['identifier'] = "Not Set"
 
+                # Get email
+                attrib_name = "email"
+                result, attrib_value = has_attribute(idp_client,
+                                                     cognito_pool_id,
+                                                     data['username'],
+                                                     attribute=attrib_name)
+
+                if attrib_value is not None:
+                    response_data['email'] = attrib_value
+                else:
+                    response_data['email'] = "Not Set"
+
         default_header['Content-Type'] = 'application/json; charset=UTF-8'
 
         return Response(body=json.dumps(response_data),

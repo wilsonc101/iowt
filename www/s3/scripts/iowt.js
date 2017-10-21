@@ -11,14 +11,14 @@ $('#thingModal').on('show.bs.modal', function(e) {
 
 });
 
-function save_device_data() {
+function save_device_data(button) {
   var deviceId = $("#deviceId").val();
   var deviceLocation = $("#deviceLocation").val();
   var deviceName = $("#deviceName").val();
-  var apiUrl = $("#apiUrl").val();
+  var apiUrl = $(button).data("apiurl");
 
   var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", apiUrl, true);
+  xhttp.open("POST", apiUrl, false);
   xhttp.setRequestHeader('Content-type', 'application/json');
   xhttp.send(JSON.stringify({"device-id":deviceId,
                              "device-name":deviceName, 

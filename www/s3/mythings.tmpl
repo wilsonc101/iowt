@@ -22,16 +22,16 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="myhome.html">{{ icon_path }}</a>
+      <a class="navbar-brand" href="myhome">{{ icon_path }}</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-left">
         {% if isadmin %}
-          <li><a href="admin.html">Admin</a></li>
+          <li><a href="admin">Admin</a></li>
         {% endif %}
-        <li><a href="sightings.html">Sightings</a></li>
+        <li><a href="sightings">Sightings</a></li>
         <li class="active"><a href="#">My Things</a></li>
       </ul>
 
@@ -39,7 +39,7 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{username}}<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="settings.html">Settings</a></li>
+            <li><a href="settings">Settings</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="#">Sign Out</a></li>
           </ul>
@@ -74,20 +74,20 @@
                 {% for device in devices %}
                 <tr>
                     <td>{{device.id}}</td>
-                    <td><em>{{device.name}}</em></td>
-                    <td><em>{{device.location}}</em></td>
-                    {% if device.status == "online" %}
-                        <td class="success">{{device.status}}</td>
-                    {% elif device.status == "offline" %}
-                        <td class="danger">{{device.status}}</td>
+                    <td><em>{{device.deviceName}}</em></td>
+                    <td><em>{{device.deviceLocation}}</em></td>
+                    {% if device.deviceStatus == "online" %}
+                        <td class="success">{{device.deviceStatus}}</td>
+                    {% elif device.deviceStatus == "offline" %}
+                        <td class="danger">{{device.deviceStatus}}</td>
                     {% else %}
-                        <td class="warning">{{device.status}}</td>
+                        <td class="warning">{{device.deviceStatus}}</td>
                     {% endif %}
                     <td class="text-right">
                         <button class="btn btn-default"  
                                 data-deviceid="{{device.id}}"
-                                data-devicename="{{device.name}}"
-                                data-devicelocation="{{device.location}}"
+                                data-devicename="{{device.deviceName}}"
+                                data-devicelocation="{{device.deviceLocation}}"
                                 data-toggle="modal" 
                                 data-target="#thingModal">Edit</button>
                     </td>
@@ -131,7 +131,7 @@
   </div>
 </div>
    
-<script src="scripts/iowt.js"></script>
+<script src="https://robotika.co.uk/iowt.js"></script>
 
     
 </body>
