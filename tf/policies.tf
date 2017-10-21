@@ -73,8 +73,19 @@ data "aws_iam_policy_document" "iowt-www-policy-document" {
     sid = "6"
     actions = ["dynamodb:DeleteItem",
                "dynamodb:PutItem",
+               "dynamodb:UpdateItem",
                "dynamodb:Scan"]
     resources = ["arn:aws:dynamodb:eu-west-1:*:table/iowt-events"]
+    effect = "Allow"
+  }
+
+  statement {
+    sid = "7"
+    actions = ["dynamodb:DeleteItem",
+               "dynamodb:PutItem",
+               "dynamodb:UpdateItem",
+               "dynamodb:Scan"]
+    resources = ["arn:aws:dynamodb:eu-west-1:*:table/iowt-devices"]
     effect = "Allow"
   }
 }
