@@ -9,6 +9,7 @@ import json
 import os
 import urllib
 import ast
+import bleach
 
 from chalice import Chalice, Response
 app = Chalice(app_name='iowt-www')
@@ -104,6 +105,13 @@ def get_all_things(table_name):
 
     things = list()
     for item in response['Items']:
+        # Trim long entries
+        if "deviceKey" in item:
+            item['deviceKey'] = item['deviceKey'][:8] + "..."
+
+        if "deviceToken" in item:
+            item['deviceToken'] = "..." + item['deviceToken'][-8:]
+
         things.append(item)
 
     return things
@@ -231,8 +239,8 @@ def showpage(pages):
                  post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
 
                  resp = update_device(device_id=post_data['device-id'],
-                                      device_location=post_data['device-location'],
-                                      device_name=post_data['device-name'],
+                                      device_location=bleach.clean(post_data['device-location']),
+                                      device_name=bleach.clean(post_data['device-name']),
                                       table_name=iowt_device_table)
 
                  return Response(body=resp,

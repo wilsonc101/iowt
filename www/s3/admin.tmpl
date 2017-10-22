@@ -65,6 +65,8 @@
                   <th>ID</th>
                   <th>Owner</th>    
                   <th>Status</th>
+                  <th>Key</th>
+                  <th>Token</th>
                   <th> </th>
                 </tr>
                 </thead>
@@ -80,6 +82,8 @@
                     {% else %}
                         <td class="warning">{{device.deviceStatus}}</td>
                     {% endif %}
+                    <td>{{device.deviceKey}}</td>
+                    <td>{{device.deviceToken}}</td>
                     <td class="text-right">
                         <button class="btn btn-default">Set Owner</button>
                         <button class="btn btn-default">Re-Key</button>
