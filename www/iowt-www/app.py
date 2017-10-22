@@ -146,7 +146,6 @@ def get_user_sightings(username, things, table_name):
            methods=['GET'])
 def index():
     s3_bucket = os.environ['bucket']
-    token_validation_url = os.environ['loginurl']
     iowt_device_table = os.environ['iowt_device_table']
     iowt_events_table = os.environ['iowt_events_table']
 
@@ -200,11 +199,10 @@ def index():
            methods=['GET', 'POST'])
 def showpage(pages):
     s3_bucket = os.environ['bucket']
-    token_validation_url = os.environ['loginurl']
     iowt_device_table = os.environ['iowt_device_table']
     iowt_events_table = os.environ['iowt_events_table']
     iowt_api_url = os.environ['iowt_api']
-
+    sightings_image_url = os.environ['sightings_image_url']
     try:
         user_data = get_user_data(app.current_request.headers)
 
@@ -299,6 +297,7 @@ def showpage(pages):
                 content['isadmin'] = user_data['is_admin']
                 content['username'] = user_data['username']
                 content['events'] = sightings
+                content['imageurl'] = sightings_image_url
 
                 html_content = render_s3_template(S3_CLIENT, s3_bucket,
                                                   avaliable_pages[pages],
@@ -382,6 +381,60 @@ def showpage(pages):
                             status_code=404,
                             headers={'Content-Type': 'text/html',
                                      'Access-Control-Allow-Origin': '*'})
+
+    except:
+        return Response(body=str(sys.exc_info()) + " -- " + str(sys.exc_info()[1]),
+                        status_code=500,
+                        headers=default_header)
+
+
+@app.route('/image/{imageid}',
+           methods=['GET'])
+def makeimage(imageid):
+    s3_event_bucket = os.environ['event_bucket']
+    s3_bucket = os.environ['bucket']
+    iowt_device_table = os.environ['iowt_device_table']
+
+    try:
+        user_data = get_user_data(app.current_request.headers)
+
+        # Reject request if no user data avaliable
+        if not user_data:
+            html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                              "login.tmpl",
+                                              {"icon_path":icon_path})
+
+            return Response(body=html_content,
+                            status_code=200,
+                            headers=default_header)
+
+        # Get ids of 'things' owned by user
+        things = get_user_things(user_data['username'], iowt_device_table)
+        thing_ids = list()
+
+        for thing in things:
+            thing_ids.append(thing['id'])
+
+        image_object = S3_CLIENT.get_object(Bucket=s3_event_bucket, Key=imageid)
+        image_metadata = image_object['Metadata']
+
+        # Check device is owned by user
+        if image_metadata['device_id'] in thing_ids:
+            image_content = base64.b64encode(image_object['Body'].read())
+            image = image_content.decode('utf-8')
+            src_html = "data:image/png;base64,%s" % image
+
+            return Response(body=src_html,
+                            status_code=200,
+                            headers={'Content-Type': 'text/html',
+                                     'Access-Control-Allow-Origin': '*'})
+
+        else:
+            return Response(body="False",
+                            status_code=200,
+                            headers={'Content-Type': 'text/html',
+                                     'Access-Control-Allow-Origin': '*'})
+
 
     except:
         return Response(body=str(sys.exc_info()) + " -- " + str(sys.exc_info()[1]),

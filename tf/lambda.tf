@@ -67,6 +67,7 @@ resource "aws_lambda_function" "iowt-www" {
       iowt_device_table = "iowt-devices"
       logopath = "Things"      
       iowt_api = "https://iowt.robotika.co.uk/www"
+      sightings_image_url = "https://iowt.robotika.co.uk/www/image"
     }
   }
 

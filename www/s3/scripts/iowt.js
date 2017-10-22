@@ -99,9 +99,20 @@ function save_user_settings() {
 
 $('#imageModal').on('show.bs.modal', function(e) {
   var image = e.relatedTarget.dataset.image;
+  var imageUrl = e.relatedTarget.dataset.imageurl;
 
   var eventImage = document.getElementById("full-image");
   eventImage.alt = image;
-  eventImage.src = "https://robotika.co.uk/robotika.png";
+
+  var xhttp = new XMLHttpRequest();
+
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      eventImage.src = xhttp.responseText;
+  }};
+
+  xhttp.open("GET", imageUrl, false);
+  xhttp.send();
+
 });
 

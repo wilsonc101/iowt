@@ -145,9 +145,61 @@ resource "aws_api_gateway_method_response" "iowt-www-pages-get-200" {
   }
 }
 
+
+## IMAGE
+resource "aws_api_gateway_resource" "iowt-www-image" {
+  rest_api_id = "${aws_api_gateway_rest_api.iowt-www.id}"
+  parent_id   = "${aws_api_gateway_rest_api.iowt-www.root_resource_id}"
+  path_part   = "image"
+}
+
+resource "aws_api_gateway_resource" "iowt-www-imageid" {
+  rest_api_id = "${aws_api_gateway_rest_api.iowt-www.id}"
+  parent_id   = "${aws_api_gateway_resource.iowt-www-image.id}"
+  path_part   = "{imageid}"
+}
+
+resource "aws_api_gateway_method" "iowt-www-imageid-get" {
+  rest_api_id   = "${aws_api_gateway_rest_api.iowt-www.id}"
+  resource_id   = "${aws_api_gateway_resource.iowt-www-imageid.id}"
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "iowt-www-imageid-get" {
+  rest_api_id             = "${aws_api_gateway_rest_api.iowt-www.id}"
+  resource_id             = "${aws_api_gateway_resource.iowt-www-imageid.id}"
+  http_method             = "${aws_api_gateway_method.iowt-www-imageid-get.http_method}"
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.iowt-www.arn}/invocations"
+}
+
+resource "aws_lambda_permission" "iowt-www-imageid-get" {
+  statement_id  = "AllowExecutionFromAPIGateway-iowt-www-imageid-get"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.iowt-www.arn}"
+  principal     = "apigateway.amazonaws.com"
+  source_arn = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.iowt-www.id}/*/${aws_api_gateway_method.iowt-www-imageid-get.http_method}/*"
+}
+
+resource "aws_api_gateway_method_response" "iowt-www-imageid-get-200" {
+  rest_api_id   = "${aws_api_gateway_rest_api.iowt-www.id}"
+  resource_id   = "${aws_api_gateway_resource.iowt-www-imageid.id}"
+  http_method   = "${aws_api_gateway_method.iowt-www-imageid-get.http_method}"
+  status_code = "200"
+  response_models = {
+    "text/html" = "Empty"
+  }
+}
+
+
 # Deployment
 resource "aws_api_gateway_deployment" "iowt-www-dev" {
-  depends_on = ["aws_api_gateway_method.iowt-www-newevent-post", "aws_api_gateway_method.iowt-www-pages-get", "aws_api_gateway_method.iowt-www-pages-post"]
+  depends_on = ["aws_api_gateway_method.iowt-www-newevent-post",
+                "aws_api_gateway_method.iowt-www-pages-get",
+                "aws_api_gateway_method.iowt-www-pages-post",
+                "aws_api_gateway_method.iowt-www-imageid-get"]
 
 #"aws_api_gateway_method.iowt-www-root-get",
   rest_api_id = "${aws_api_gateway_rest_api.iowt-www.id}"
