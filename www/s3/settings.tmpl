@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>IOWT - Settings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link href="https://robotika.co.uk/bootstrap.min.css" rel="stylesheet">
@@ -64,12 +65,12 @@
 
     <div class="panel panel-default">
       <div class="panel-body">
-        <form class="form-horizontal">
+        <form class="form-horizontal" autocomplete="off">
 
           <div class="form-group">
             <label for="inputUsername" class="col-md-3 control-label text-left">Username</label>
             <div class="col-md-9">
-              <input type="text" class="form-control" id="inputUsername" placeholder="{{username}}" readonly>
+              <input type="text" class="form-control" id="inputUsername" placeholder="{{username}} (readonly)" readonly>
             </div>
           </div>
 
@@ -77,14 +78,14 @@
           <div class="form-group">
             <label for="inputEmail" class="col-md-3 control-label text-left">Email</label>
             <div class="col-md-9">
-              <input type="text" class="form-control" id="inputEmail" placeholder="test@test.test">
+              <input type="text" class="form-control" id="inputEmail" placeholder="{{current_email_address}}" readonly onfocus="this.removeAttribute('readonly');">
             </div>
           </div>
 
           <div class="form-group">
             <label for="inputPassword" class="col-md-3 control-label text-left">Password</label>
             <div class="col-md-9">
-              <input type="password" class="form-control" id="inputPassword" placeholder="New Password">
+              <input type="password" class="form-control" id="inputPassword" placeholder="New Password" readonly onfocus="this.removeAttribute('readonly');">
             </div>
           </div>
           <button type="submit" class="btn btn-primary disabled" onclick="save_user_settings(this);" disabled="disabled">Save</button>
