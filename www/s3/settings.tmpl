@@ -32,7 +32,7 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-left">
-        {% if isadmin %}
+        {% if isadmin  == "True" %}
           <li><a href="admin">Admin</a></li>
         {% endif %}
         <li><a href="sightings">Sightings</a></li>
