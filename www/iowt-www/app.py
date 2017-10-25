@@ -87,6 +87,21 @@ def update_device(device_id, device_location, device_name, table_name):
 
     return True
 
+def delete_sighting(sighting_id, bucket_name, table_name):
+    ddb_table = DDB_RESOURCE.Table(table_name)
+
+    # Delete table item(s)
+    results = S3_CLIENT.list_objects(Bucket=bucket_name, Prefix=sighting_id)
+    if 'Contents' not in results:
+        return str(results)
+    for s3_object in results['Contents']:
+        S3_CLIENT.delete_object(Bucket=bucket_name, Key=s3_object['Key'])
+
+    # Delete S3 items
+    response = ddb_table.delete_item(Key={'id': sighting_id})
+
+    return True
+
 
 def get_user_things(username, table_name):
     ddb_table = DDB_RESOURCE.Table(table_name)
@@ -199,10 +214,12 @@ def index():
            methods=['GET', 'POST'])
 def showpage(pages):
     s3_bucket = os.environ['bucket']
+    s3_event_bucket = os.environ['event_bucket']
     iowt_device_table = os.environ['iowt_device_table']
     iowt_events_table = os.environ['iowt_events_table']
     iowt_api_url = os.environ['iowt_api']
     sightings_image_url = os.environ['sightings_image_url']
+
     try:
         user_data = get_user_data(app.current_request.headers)
 
@@ -241,14 +258,18 @@ def showpage(pages):
                                       device_name=bleach.clean(post_data['device-name']),
                                       table_name=iowt_device_table)
 
-                 return Response(body=resp,
-                                 status_code=200,
-                                 headers={'Content-Type': 'text/html',
-                                          'Access-Control-Allow-Origin': '*'})
-
+            # sightings
             elif pages == "sightings":
                  post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
 
+                 resp = delete_sighting(sighting_id = post_data['eventid'],
+                                        bucket_name = s3_event_bucket,
+                                        table_name = iowt_events_table)
+
+            return Response(body=resp,
+                            status_code=200,
+                            headers={'Content-Type': 'text/html',
+                                     'Access-Control-Allow-Origin': '*'})
 
 
         # GET - Render page as requested
@@ -277,14 +298,6 @@ def showpage(pages):
                 content['icon_path'] = icon_path
                 content['username'] = user_data['username']
 
-                html_content = render_s3_template(S3_CLIENT, s3_bucket,
-                                                  avaliable_pages[pages],
-                                                  content)
-
-                return Response(body=html_content,
-                                status_code=200,
-                                headers={'Content-Type': 'text/html',
-                                         'Access-Control-Allow-Origin': '*'})
 
             # sightings
             elif pages == "sightings":
@@ -299,14 +312,6 @@ def showpage(pages):
                 content['events'] = sightings
                 content['imageurl'] = sightings_image_url
 
-                html_content = render_s3_template(S3_CLIENT, s3_bucket,
-                                                  avaliable_pages[pages],
-                                                  content)
-
-                return Response(body=html_content,
-                                status_code=200,
-                                headers={'Content-Type': 'text/html',
-                                         'Access-Control-Allow-Origin': '*'})
 
             # admin
             elif pages == "admin":
@@ -319,14 +324,6 @@ def showpage(pages):
                 content['username'] = user_data['username']
                 content['devices'] = things
 
-                html_content = render_s3_template(S3_CLIENT, s3_bucket,
-                                                  avaliable_pages[pages],
-                                                  content)
-
-                return Response(body=html_content,
-                                status_code=200,
-                                headers={'Content-Type': 'text/html',
-                                         'Access-Control-Allow-Origin': '*'})
 
             # myhome
             elif pages == "myhome":
@@ -347,14 +344,6 @@ def showpage(pages):
                 sightings = get_user_sightings(user_data['username'], things, iowt_events_table)
                 content['sightingscount'] = len(sightings)
 
-                html_content = render_s3_template(S3_CLIENT, s3_bucket,
-                                                  avaliable_pages[pages],
-                                                  content)
-
-                return Response(body=html_content,
-                                status_code=200,
-                                headers={'Content-Type': 'text/html',
-                                         'Access-Control-Allow-Origin': '*'})
 
             # settings
             elif pages == "settings":
@@ -365,14 +354,14 @@ def showpage(pages):
                 content['username'] = user_data['username']
                 content['current_email_address'] = user_data['email']
 
-                html_content = render_s3_template(S3_CLIENT, s3_bucket,
+            html_content = render_s3_template(S3_CLIENT, s3_bucket,
                                                   avaliable_pages[pages],
                                                   content)
 
-                return Response(body=html_content,
-                                status_code=200,
-                                headers={'Content-Type': 'text/html',
-                                         'Access-Control-Allow-Origin': '*'})
+            return Response(body=html_content,
+                            status_code=200,
+                            headers={'Content-Type': 'text/html',
+                                     'Access-Control-Allow-Origin': '*'})
 
 
         # Reject unknown method (not that it should get here)

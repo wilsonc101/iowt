@@ -49,7 +49,7 @@ function event_delete(button) {
   var apiUrl = $(button).data("url");
 
   var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", apiUrl, true);
+  xhttp.open("POST", apiUrl, false);
   xhttp.setRequestHeader('Content-type', 'application/json');
   xhttp.send(JSON.stringify({"eventid":eventId, "action":"delete"}));
   location.reload();

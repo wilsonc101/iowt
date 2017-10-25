@@ -60,14 +60,29 @@ for thing in things:
 sample_data = {'device-id': '123abc', 'device-name': 'Inside', 'device-location': 'Out the front', 'action': 'update'}
 
 
-response = ddb_device_table.update_item(
-    Key={
-        'id': sample_data['device-id']
-    },
-    UpdateExpression="SET deviceLocation=:value1, deviceName=:value2",
-    ExpressionAttributeValues={
-        ':value1': sample_data['device-location'],
-        ':value2': sample_data['device-name'],
-    },
-    ReturnValues="UPDATED_NEW"
-)
+#response = ddb_device_table.update_item(
+#    Key={
+#        'id': sample_data['device-id']
+#    },
+#    UpdateExpression="SET deviceLocation=:value1, deviceName=:value2",
+#    ExpressionAttributeValues={
+#        ':value1': sample_data['device-location'],
+#        ':value2': sample_data['device-name'],
+#    },
+#    ReturnValues="UPDATED_NEW"
+#)
+
+
+
+event_id = "b7df85b5-1fa6-443b-bf2c-d89db07c5cf7"
+
+bucket_name = "iowt-events"
+
+results = S3_CLIENT.list_objects(Bucket=bucket_name, Prefix=event_id)
+print(results)
+
+#for s3_object in results['Contents']:
+#    S3_CLIENT.delete_object(Bucket=bucket_name, Key=s3_objectx['Key'])
+
+#response = ddb_event_table.delete_item(Key={'id': event_id})
+#print(response)
