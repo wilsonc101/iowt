@@ -315,6 +315,14 @@ def showpage(pages):
 
             # admin
             elif pages == "admin":
+
+                # Reject non-admin user
+                if user_data['is_admin'] != "True":
+                    return Response(body="Nothing of that name here!",
+                                    status_code=404,
+                                    headers={'Content-Type': 'text/html',
+                                             'Access-Control-Allow-Origin': '*'})
+
                 things = get_all_things(iowt_device_table)
 
                 content = dict()

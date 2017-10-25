@@ -56,6 +56,7 @@ data "aws_iam_policy_document" "iowt-www-policy-document" {
   statement {
     sid = "4"
     actions = ["s3:GetObject",
+               "s3:DeleteObject",
                "s3:PutObject"]
     resources = ["arn:aws:s3:::iowt-events/*"]
     effect = "Allow"
@@ -63,6 +64,15 @@ data "aws_iam_policy_document" "iowt-www-policy-document" {
 
   statement {
     sid = "5"
+    actions = ["s3:ListBucket",
+               "s3:ListObjects"]
+    resources = ["arn:aws:s3:::iowt-events"]
+    effect = "Allow"
+  }
+
+
+  statement {
+    sid = "6"
     actions = ["cognito-idp:AdminListGroupsForUser",
                "cognito-idp:AdminGetUser"]
     resources = ["arn:aws:cognito-idp:*:*:*"]
@@ -70,7 +80,7 @@ data "aws_iam_policy_document" "iowt-www-policy-document" {
   }
 
   statement {
-    sid = "6"
+    sid = "7"
     actions = ["dynamodb:DeleteItem",
                "dynamodb:PutItem",
                "dynamodb:UpdateItem",
@@ -80,7 +90,7 @@ data "aws_iam_policy_document" "iowt-www-policy-document" {
   }
 
   statement {
-    sid = "7"
+    sid = "8"
     actions = ["dynamodb:DeleteItem",
                "dynamodb:PutItem",
                "dynamodb:UpdateItem",
