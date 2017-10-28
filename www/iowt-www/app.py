@@ -156,6 +156,32 @@ def get_user_sightings(username, things, table_name):
 
     return events
 
+## HTTP RETURNS
+def _send_200(html_content):
+    return Response(body=html_content,
+                    status_code=200,
+                    headers=default_header)
+
+def _send_404():
+    return Response(body="Not seen one of those before, best call Chris Packham!",
+                    status_code=404,
+                    headers=default_header)
+#                    headers={'Content-Type': 'text/html',
+#                             'Access-Control-Allow-Origin': '*'})
+
+def _send_500(content):
+    return Response(body=content,
+                    status_code=500,
+                    headers=default_header)
+
+def _send_login():
+    s3_bucket = os.environ['bucket']
+    html_content = render_s3_template(S3_CLIENT, s3_bucket,
+                                              "login.tmpl",
+                                              {"icon_path":icon_path})
+    return _send_200(html_content)
+
+
 
 @app.route('/',
            methods=['GET'])
@@ -169,13 +195,7 @@ def index():
 
         # Reject request if no user data avaliable
         if not user_data:
-            html_content = render_s3_template(S3_CLIENT, s3_bucket,
-                                              "login.tmpl",
-                                              {"icon_path":icon_path})
-
-            return Response(body=html_content,
-                            status_code=200,
-                            headers=default_header)
+            return _send_login()
 
         #####
         content = dict()
@@ -199,15 +219,10 @@ def index():
         html_content = render_s3_template(S3_CLIENT, s3_bucket,
                                           "myhome.tmpl", content)
 
-        return Response(body=html_content,
-                        status_code=200,
-                        headers={'Content-Type': 'text/html',
-                                 'Access-Control-Allow-Origin': '*'})
+        return _send_200(html_content)
 
     except:
-        return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
-                        status_code=500,
-                        headers=default_header)
+        return _send_500(str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]))
 
 
 @app.route('/{pages}',
@@ -225,13 +240,7 @@ def showpage(pages):
 
         # Reject request if no user data avaliable
         if not user_data:
-            html_content = render_s3_template(S3_CLIENT, s3_bucket,
-                                              "login.tmpl",
-                                              {"icon_path":icon_path})
-
-            return Response(body=html_content,
-                            status_code=200,
-                            headers=default_header)
+            return _send_login()
 
         request = app.current_request
         # POST - Take incoming posted data (e.g. from forms)
@@ -243,33 +252,61 @@ def showpage(pages):
 
             # Reject unknown page
             if pages not in avaliable_pages:
-                return Response(body="Nothing of that name here!",
-                                status_code=404,
-                                headers={'Content-Type': 'text/html',
-                                         'Access-Control-Allow-Origin': '*'})
-
+                return _send_404()
 
             # mythings
             if pages == "mythings":
-                 post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
+                post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
+                things = get_user_things(user_data['username'], iowt_device_table)
 
-                 resp = update_device(device_id=post_data['device-id'],
-                                      device_location=bleach.clean(post_data['device-location']),
-                                      device_name=bleach.clean(post_data['device-name']),
-                                      table_name=iowt_device_table)
+                for thing in things:
+                    if thing['id'] == post_data['device-id']:
+                        resp = update_device(device_id=post_data['device-id'],
+                                             device_location=bleach.clean(post_data['device-location']),
+                                             device_name=bleach.clean(post_data['device-name']),
+                                             table_name=iowt_device_table)
+
+                        return _send_200(resp)
+
+                return send_404()
 
             # sightings
             elif pages == "sightings":
-                 post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
+                post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
 
-                 resp = delete_sighting(sighting_id = post_data['eventid'],
-                                        bucket_name = s3_event_bucket,
-                                        table_name = iowt_events_table)
+                things = get_user_things(user_data['username'], iowt_device_table)
+                sightings = get_user_sightings(user_data['username'], things, iowt_events_table)
 
-            return Response(body=resp,
-                            status_code=200,
-                            headers={'Content-Type': 'text/html',
-                                     'Access-Control-Allow-Origin': '*'})
+                for sighting in sightings:
+                    if sighting['id'] == post_data['eventid']:
+                        resp = delete_sighting(sighting_id = post_data['eventid'],
+                                               bucket_name = s3_event_bucket,
+                                               table_name = iowt_events_table)
+
+                        return _send_200(resp)
+
+                return send_404()
+
+            # admin
+            elif pages == "admin":
+                # Reject non-admin user
+                if user_data['is_admin'] != "True":
+                    return _send_404()
+
+                post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
+                action = post_data['action']
+
+                if action == "update":
+                    pass
+                elif action == "disable":
+                    pass
+                elif action == "delete":
+                    pass
+
+
+            # admin
+            elif pages == "admin":
+                post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
 
 
         # GET - Render page as requested
@@ -282,10 +319,7 @@ def showpage(pages):
 
             # Reject unknown page
             if pages not in avaliable_pages:
-                return Response(body="Nothing of that name here!",
-                                status_code=404,
-                                headers={'Content-Type': 'text/html',
-                                         'Access-Control-Allow-Origin': '*'})
+                return _send_404()
 
             # mythings
             if pages == "mythings":
@@ -315,13 +349,9 @@ def showpage(pages):
 
             # admin
             elif pages == "admin":
-
                 # Reject non-admin user
                 if user_data['is_admin'] != "True":
-                    return Response(body="Nothing of that name here!",
-                                    status_code=404,
-                                    headers={'Content-Type': 'text/html',
-                                             'Access-Control-Allow-Origin': '*'})
+                    return _send_404()
 
                 things = get_all_things(iowt_device_table)
 
@@ -366,23 +396,15 @@ def showpage(pages):
                                                   avaliable_pages[pages],
                                                   content)
 
-            return Response(body=html_content,
-                            status_code=200,
-                            headers={'Content-Type': 'text/html',
-                                     'Access-Control-Allow-Origin': '*'})
+            return _send_200(html_content)
 
 
         # Reject unknown method (not that it should get here)
         else:
-            return Response(body="Nothing of that name here!",
-                            status_code=404,
-                            headers={'Content-Type': 'text/html',
-                                     'Access-Control-Allow-Origin': '*'})
+            return _send_404()
 
     except:
-        return Response(body=str(sys.exc_info()) + " -- " + str(sys.exc_info()[1]),
-                        status_code=500,
-                        headers=default_header)
+        return _send_500(str(sys.exc_info()) + " -- " + str(sys.exc_info()[1]))
 
 
 @app.route('/image/{imageid}',
@@ -397,13 +419,7 @@ def makeimage(imageid):
 
         # Reject request if no user data avaliable
         if not user_data:
-            html_content = render_s3_template(S3_CLIENT, s3_bucket,
-                                              "login.tmpl",
-                                              {"icon_path":icon_path})
-
-            return Response(body=html_content,
-                            status_code=200,
-                            headers=default_header)
+            return _send_login()
 
         # Get ids of 'things' owned by user
         things = get_user_things(user_data['username'], iowt_device_table)
@@ -412,7 +428,12 @@ def makeimage(imageid):
         for thing in things:
             thing_ids.append(thing['id'])
 
-        image_object = S3_CLIENT.get_object(Bucket=s3_event_bucket, Key=imageid)
+        # Get image, return 404 if not found
+        try:
+            image_object = S3_CLIENT.get_object(Bucket=s3_event_bucket, Key=imageid)
+        except S3_CLIENT.exceptions.NoSuchKey as e:
+            return _send_404()
+
         image_metadata = image_object['Metadata']
 
         # Check device is owned by user
@@ -421,22 +442,13 @@ def makeimage(imageid):
             image = image_content.decode('utf-8')
             src_html = "data:image/png;base64,%s" % image
 
-            return Response(body=src_html,
-                            status_code=200,
-                            headers={'Content-Type': 'text/html',
-                                     'Access-Control-Allow-Origin': '*'})
+            return _send_200(src_html)
 
         else:
-            return Response(body="False",
-                            status_code=200,
-                            headers={'Content-Type': 'text/html',
-                                     'Access-Control-Allow-Origin': '*'})
-
+            return _send_404()
 
     except:
-        return Response(body=str(sys.exc_info()) + " -- " + str(sys.exc_info()[1]),
-                        status_code=500,
-                        headers=default_header)
+        return _send_500(str(sys.exc_info()) + " -- " + str(sys.exc_info()[1]))
 
 
 @app.route('/newevent',
@@ -480,15 +492,10 @@ def event_post():
                              Bucket=s3_bucket,
                              Key=json_data['event_id'] + "." + json_data['event_data']['image_type'])
 
-        return Response(body="OK",
-                        status_code=200,
-                        headers={'Content-Type': 'text/html',
-                                 'Access-Control-Allow-Origin': '*'})
+        return _send_200("OK")
 
     except:
-        return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
-                        status_code=500,
-                        headers={'Content-Type': 'text/plain'})
+        return _send_500(str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]))
 
 
 

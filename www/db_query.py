@@ -29,10 +29,12 @@ for item in response['Items']:
 
 # Loop through devices and pick all tagged with 'owner'
 things = list()
-response = ddb_device_table.scan(FilterExpression=Attr('owner').eq(owner))
+response = ddb_device_table.scan(FilterExpression=Attr('deviceOwner').eq(owner))
 for item in response['Items']:
     things.append(item)
  #   print(item)
+print(things)
+
 
 # loop devices and get events
 events = list()
@@ -74,12 +76,12 @@ sample_data = {'device-id': '123abc', 'device-name': 'Inside', 'device-location'
 
 
 
-event_id = "b7df85b5-1fa6-443b-bf2c-d89db07c5cf7"
+#event_id = "b7df85b5-1fa6-443b-bf2c-d89db07c5cf7"
 
-bucket_name = "iowt-events"
+#bucket_name = "iowt-events"
 
-results = S3_CLIENT.list_objects(Bucket=bucket_name, Prefix=event_id)
-print(results)
+#results = S3_CLIENT.list_objects(Bucket=bucket_name, Prefix=event_id)
+#print(results)
 
 #for s3_object in results['Contents']:
 #    S3_CLIENT.delete_object(Bucket=bucket_name, Key=s3_objectx['Key'])
