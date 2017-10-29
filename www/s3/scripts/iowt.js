@@ -11,6 +11,15 @@ $('#thingModal').on('show.bs.modal', function(e) {
 
 });
 
+$('#adminthingModal').on('show.bs.modal', function(e) {
+  var deviceId = e.relatedTarget.dataset.deviceid;
+  var deviceOwner = e.relatedTarget.dataset.deviceowner;
+
+  $(e.currentTarget).find('input[name="deviceId"]').val(deviceId);
+  $(e.currentTarget).find('input[name="deviceOwner"]').val(deviceOwner);
+
+});
+
 function save_device_data(button) {
   var deviceId = $("#deviceId").val();
   var deviceLocation = $("#deviceLocation").val();
@@ -23,6 +32,23 @@ function save_device_data(button) {
   xhttp.send(JSON.stringify({"device-id":deviceId,
                              "device-name":deviceName, 
                              "device-location":deviceLocation, 
+                             "action":"update"}));
+
+  $('#thingModal').modal('hide');
+  location.reload();
+
+};
+
+function admin_save_device_data(button) {
+  var deviceId = $("#deviceId").val();
+  var deviceOwner = $("#deviceOwner").val();
+  var apiUrl = $(button).data("apiurl");
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, false);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"device-id":deviceId,
+                             "device-owner":deviceOwner, 
                              "action":"update"}));
 
   $('#thingModal').modal('hide');
@@ -61,9 +87,9 @@ function device_delete(button) {
   var apiUrl = $(button).data("url");
 
   var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", apiUrl, true);
+  xhttp.open("POST", apiUrl, false);
   xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify({"deviceid":deviceId, "action":"delete"}));
+  xhttp.send(JSON.stringify({"device-id":deviceId, "action":"delete"}));
   location.reload();
 
 };
@@ -73,9 +99,21 @@ function device_disable(button) {
   var apiUrl = $(button).data("url");
 
   var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", apiUrl, true);
+  xhttp.open("POST", apiUrl, false);
   xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify({"deviceid":deviceId, "action":"disable"}));
+  xhttp.send(JSON.stringify({"device-id":deviceId, "action":"disable"}));
+  location.reload();
+
+};
+
+function device_enable(button) {
+  var deviceId = $(button).data("deviceid");
+  var apiUrl = $(button).data("url");
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, false);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"device-id":deviceId, "action":"enable"}));
   location.reload();
 
 };

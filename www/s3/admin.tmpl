@@ -80,17 +80,28 @@
                         <td class="success">{{device.deviceStatus}}</td>
                     {% elif device.deviceStatus == "offline" %}
                         <td class="danger">{{device.deviceStatus}}</td>
+                    {% elif device.deviceStatus == "disabled" %}
+                        <td class="active">{{device.deviceStatus}}</td>
                     {% else %}
                         <td class="warning">{{device.deviceStatus}}</td>
                     {% endif %}
                     <td>{{device.deviceKey}}</td>
                     <td>{{device.deviceToken}}</td>
                     <td class="text-right">
-                        <button class="btn btn-default">Set Owner</button>
+                        <button class="btn btn-default" data-deviceid="{{device.id}}" data-deviceowner="{{device.deviceOwner}}" data-toggle="modal" data-target="#adminthingModal">Set Owner</button>
                         <button class="btn btn-default">Re-Key</button>
-                        <button class="btn btn-default" id="device-disable" data-url="{{apiurl}}" data-deviceid="{{device.id}}" onclick="device_disable(this);">Disable</button>
-                        <button class="btn btn-default" id="device-delete" data-url="{{apiurl}}" data-deviceid="{{device.id}}" onclick="device_delete(this);">Delete</button>
 
+                    {% if device.deviceStatus != "disabled" %}
+                        <button class="btn btn-default" id="device-disable" data-url="{{apiurl}}" data-deviceid="{{device.id}}" onclick="device_disable(this);">Disable</button>
+                    {% elif device.deviceStatus == "disabled" %}
+                        <button class="btn btn-default" id="device-enable" data-url="{{apiurl}}" data-deviceid="{{device.id}}" onclick="device_enable(this);">Enable</button>
+                    {% endif %}
+
+                    {% if device.deviceStatus == "disabled" %}
+                        <button class="btn btn-default" id="device-delete" data-url="{{apiurl}}" data-deviceid="{{device.id}}" onclick="device_delete(this);">Delete</button>
+                    {% else %}
+                        <button class="btn btn-default disabled" id="device-delete" data-url="{{apiurl}}" data-deviceid="{{device.id}}" onclick="device_delete(this);" disabled="disabled">Delete</button>
+                    {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -100,6 +111,34 @@
           </section>
       </div>
   </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="adminthingModal" tabindex="-1" role="dialog" aria-labelledby="adminthingModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="adminthingModalLabel">Thing Details</h4>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">id       </span>
+            <input class="form-control" type="text" name="deviceId" id="deviceId" placeholder="" readonly />
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon" id="basic-addon1">owner    </span>
+            <input class="form-control" type="text" name="deviceOwner" id="deviceOwner" placeholder="" />
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-apiurl="{{apiurl}}" onclick="admin_save_device_data(this);">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="https://robotika.co.uk/iowt.js"></script>
 

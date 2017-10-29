@@ -74,18 +74,31 @@ def get_user_data(headers):
         return False
 
 
-def update_device(device_id, device_location, device_name, table_name):
+def update_device(table_name, device_id, device_location=None, device_name=None, device_owner=None):
     ddb_table = DDB_RESOURCE.Table(table_name)
 
-    response = ddb_table.update_item(
-    Key={'id': device_id},
-    UpdateExpression="SET deviceLocation=:value1, deviceName=:value2",
-    ExpressionAttributeValues={
-        ':value1': device_location,
-        ':value2': device_name},
-    ReturnValues="UPDATED_NEW")
+    if device_owner is not None:
+        # Assume this is an admin update
+        response = ddb_table.update_item(
+        Key={'id': device_id},
+        UpdateExpression="SET deviceOwner=:value1",
+        ExpressionAttributeValues={
+            ':value1': device_owner},
+        ReturnValues="UPDATED_NEW")
 
-    return True
+        return True
+
+    else:
+        # Otherwise assume this is a user update
+        response = ddb_table.update_item(
+        Key={'id': device_id},
+        UpdateExpression="SET deviceLocation=:value1, deviceName=:value2",
+        ExpressionAttributeValues={
+            ':value1': device_location,
+            ':value2': device_name},
+        ReturnValues="UPDATED_NEW")
+
+        return True
 
 def delete_sighting(sighting_id, bucket_name, table_name):
     ddb_table = DDB_RESOURCE.Table(table_name)
@@ -156,6 +169,30 @@ def get_user_sightings(username, things, table_name):
 
     return events
 
+
+def set_device_status(device_id, status, table_name):
+    ddb_table = DDB_RESOURCE.Table(table_name)
+
+    response = ddb_table.update_item(
+    Key={'id': device_id},
+    UpdateExpression="SET deviceStatus=:value1",
+    ExpressionAttributeValues={
+        ':value1': status},
+    ReturnValues="UPDATED_NEW")
+
+    return True
+
+def delete_device(device_id, table_name):
+    ddb_table = DDB_RESOURCE.Table(table_name)
+
+    return True
+
+def rekey_device(device_id, table_name):
+    ddb_table = DDB_RESOURCE.Table(table_name)
+
+    return True
+
+
 ## HTTP RETURNS
 def _send_200(html_content):
     return Response(body=html_content,
@@ -166,8 +203,6 @@ def _send_404():
     return Response(body="Not seen one of those before, best call Chris Packham!",
                     status_code=404,
                     headers=default_header)
-#                    headers={'Content-Type': 'text/html',
-#                             'Access-Control-Allow-Origin': '*'})
 
 def _send_500(content):
     return Response(body=content,
@@ -197,7 +232,6 @@ def index():
         if not user_data:
             return _send_login()
 
-        #####
         content = dict()
         content['username'] = user_data['username']
         content['isadmin'] = user_data['is_admin']
@@ -297,15 +331,32 @@ def showpage(pages):
                 action = post_data['action']
 
                 if action == "update":
-                    pass
+                    resp = update_device(device_id=post_data['device-id'],
+                                         device_owner=bleach.clean(post_data['device-owner']),
+                                         table_name=iowt_device_table)
+
+                    return _send_200(resp)
+
                 elif action == "disable":
-                    pass
+                    result = set_device_status(post_data['device-id'], "disabled", iowt_device_table)
+                    return _send_200(result)
+
+                elif action == "enable":
+                    result = set_device_status(post_data['device-id'], "enabled", iowt_device_table)
+                    return _send_200(result)
+
                 elif action == "delete":
+                    # Delete device and all related sightings
+                    result = delete_device(post_data['device-id'], iowt_device_table)
+                    return _send_200(result)
+
+                elif action == "rekey":
+                    # Regenerate token and key
                     pass
 
 
-            # admin
-            elif pages == "admin":
+            # settings
+            elif pages == "settings":
                 post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
 
 
