@@ -51,7 +51,7 @@ with open("s3/admin.html", "w") as html_file:
 
 # Loop through devices and pick all tagged with 'owner'
 things = list()
-response = ddb_device_table.scan(FilterExpression=Attr('owner').eq(owner))
+response = ddb_device_table.scan(FilterExpression=Attr('deviceOwner').eq(owner))
 for item in response['Items']:
     things.append(item)
 
@@ -138,7 +138,6 @@ with open("s3/myhome.html", "w") as html_file:
                                        "mythingwarning":True})
     html_file.write(file_content)
 
-print(events_count)
 
 # Settings page
 with open("s3/settings.html", "w") as html_file:

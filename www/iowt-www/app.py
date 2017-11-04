@@ -74,6 +74,39 @@ def get_user_data(headers):
         return False
 
 
+def trigger_user_action(headers, action):
+    # actions should require username only (e.g password reset)
+    user_action_url = os.environ['useractionurl']
+    try:
+        access_token = None
+        if "cookie" in headers:
+            if len(headers['cookie']) > 0:
+                cookie_data = headers['cookie']
+                for cookie in cookie_data.split("; "):
+                    cookie_name = cookie.split("=")[0]
+                    cookie_content = cookie.split("=")[1]
+                    if cookie_name == "access":
+                        access_token = cookie_content
+
+        if access_token:
+            data = {'access_token': access_token,
+                    'action': action}
+
+            req = urllib.request.Request(user_action_url)
+            req.add_header('Content-Type', 'application/json')
+            encoded_data = json.dumps(data).encode("utf-8")
+            response = urllib.request.urlopen(req, encoded_data)
+            response_data = response.read().decode("utf-8")
+
+            return response_data
+
+        else:
+            return False
+
+    except:
+        return str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1])
+
+
 def update_device(table_name, device_id, device_location=None, device_name=None, device_owner=None):
     ddb_table = DDB_RESOURCE.Table(table_name)
 
@@ -217,7 +250,6 @@ def _send_login():
     return _send_200(html_content)
 
 
-
 @app.route('/',
            methods=['GET'])
 def index():
@@ -357,7 +389,17 @@ def showpage(pages):
 
             # settings
             elif pages == "settings":
+                headers = app.current_request.headers
+
                 post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
+                action = post_data['action']
+                username = post_data['username']
+
+                if action == "resetpassword":
+                    result = trigger_user_action(headers, action)
+                    return _send_200(result)
+
+                # TODO: set attributes (i.e. email)
 
 
         # GET - Render page as requested

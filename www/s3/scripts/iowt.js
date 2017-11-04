@@ -119,21 +119,26 @@ function device_enable(button) {
 };
 
 function save_user_settings() {
-  var newPassword = $("#inputPassword").val();
   var newEmail = $("#inputEmail").val();
 
-  console.log(newPassword);
-  console.log("here");
-
-//  var xhttp = new XMLHttpRequest();
-//  xhttp.open("POST", apiUrl, true);
-// xhttp.setRequestHeader('Content-type', 'application/json');
-//  xhttp.send(JSON.stringify({"newpassword":newPassword, "newEmail":newEmail, "action":"update"}));
-//  location.reload();
-
+  console.log(newEmail);
 };
 
+function reset_password(button) {
+  var username = $(button).data("username");
+  var apiUrl = $(button).data("url");
 
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, false);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"username":username, "action":"resetpassword"}));
+
+  document.cookie = 'access=;path=/;domain=.iowt.robotika.co.uk;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+
+  $(button).prop("disabled",true);
+  $("#passwordresetModal").modal();
+
+};
 
 $('#imageModal').on('show.bs.modal', function(e) {
   var image = e.relatedTarget.dataset.image;
@@ -154,3 +159,15 @@ $('#imageModal').on('show.bs.modal', function(e) {
 
 });
 
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+
+$("#passwordresetModal").on("hidden.bs.modal", function () {
+  location.reload();
+});
+
+function signout() {
+  document.cookie = 'access=;path=/;domain=.iowt.robotika.co.uk;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  location.reload();
+};

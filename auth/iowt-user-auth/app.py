@@ -181,6 +181,16 @@ def has_attribute(client, userpool_id, username, attribute="email"):
         return(result, data)
 
 
+def trigger_password_reset(client, username, userpool_id):
+    try:
+        response = client.admin_reset_user_password(Username=username,
+                                                    UserPoolId=userpool_id)
+        return(True, None)
+
+    except:
+        return(False, str(sys.exc_info()[1]))
+
+
 def _get_user_groups(client, userpool_id, username):
     try:
         response = client.admin_list_groups_for_user(Username=username,
@@ -215,7 +225,6 @@ def render_s3_template(client, bucket, template_name, content=None):
     file_object = client.get_object(Bucket=bucket, Key=template_name)
     file_content = file_object['Body'].read() .decode('utf-8')
     rendered_html = jinja2.Environment().from_string(file_content).render(content)
-#    client.put_object(Bucket=bucket, Key="test_file1.txt", Body=rendered_html)
 
     return(str(rendered_html))
 
@@ -656,4 +665,39 @@ def validate_token():
                         status_code=500,
                         headers=default_header)
 
+
+@app.route('/useraction',
+           methods=['POST'])
+def useraction():
+    try:
+        json_body = app.current_request.json_body
+        access_token = json_body['access_token'].decode("utf-8")
+        action = json_body['action'].decode("utf-8")
+
+        # all methods should be based on username only
+        valid_actions = {"resetpassword": trigger_password_reset}
+
+        result, data = get_token_data(jwk_sets, access_token)
+
+        if result:
+            if 'username' in data and action in valid_actions:
+                result, data = valid_actions[action](idp_client, data['username'], cognito_pool_id)
+
+                if result:
+                    return Response(body="OK",
+                                    status_code=200,
+                                    headers=default_header)
+                else:
+                    return Response(body=data,
+                                    status_code=200,
+                                    headers=default_header)
+
+        return Response(body="You can't do that",
+                        status_code=403,
+                        headers=default_header)
+
+    except:
+        return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
+                        status_code=200,
+                        headers=default_header)
 

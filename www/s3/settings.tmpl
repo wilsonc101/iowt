@@ -45,7 +45,7 @@
           <ul class="dropdown-menu">
             <li><a class="active" href="#">Settings</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="#">Sign Out</a></li>
+            <li><a href="#" onclick="return signout();">Sign Out</a></li>
           </ul>
         </li>
 
@@ -83,12 +83,22 @@
           </div>
 
           <div class="form-group">
-            <label for="inputPassword" class="col-md-3 control-label text-left">Password</label>
+            <label for="inputPassword" class="col-md-3 control-label text-left">Password </label>
             <div class="col-md-9">
-              <input type="password" class="form-control" id="inputPassword" placeholder="New Password" readonly onfocus="this.removeAttribute('readonly');">
+<!--              <input type="password" class="form-control" id="inputPassword" placeholder="New Password" readonly onfocus="this.removeAttribute('readonly');"> -->
+             <input type="button" class="btn btn-primary" data-url="{{apiurl}}" data-username="{{username}}" onclick="reset_password(this);" value="Reset">
+             <i class="fa fa-info-circle"
+               aria-hidden="true"
+               data-toggle="popover"
+               data-placement="right"
+               data-content="This will trigger an email containing a validation code, you will be prompted for the code and a new password at next logon." 
+               title="Password Reset">
+             </i>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary disabled" onclick="save_user_settings(this);" disabled="disabled">Save</button>
+          <div class="text-right">
+            <button type="submit" class="btn btn-primary" onclick="save_user_settings(this);">Save</button>
+          </div>
         </form>
       </div>
     </div>
@@ -101,6 +111,23 @@
 
     </div>
   </div>
+
+
+<div class="modal fade" id="passwordresetModal" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+         <div class="modal-body">
+          <p>You will now be logged out.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 <script src="https://robotika.co.uk/iowt.js"></script>
 
