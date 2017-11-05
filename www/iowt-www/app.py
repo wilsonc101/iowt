@@ -74,7 +74,41 @@ def get_user_data(headers):
         return False
 
 
-def trigger_user_action(headers, action):
+def trigger_admin_action(headers, action, actiondata=None):
+    # actions should expect JSON response
+    admin_action_url = os.environ['adminactionurl']
+    try:
+        access_token = None
+        if "cookie" in headers:
+            if len(headers['cookie']) > 0:
+                cookie_data = headers['cookie']
+                for cookie in cookie_data.split("; "):
+                    cookie_name = cookie.split("=")[0]
+                    cookie_content = cookie.split("=")[1]
+                    if cookie_name == "access":
+                        access_token = cookie_content
+
+        if access_token:
+            data = {'access_token': access_token,
+                    'action': action}
+
+            req = urllib.request.Request(admin_action_url)
+            req.add_header('Content-Type', 'application/json')
+            encoded_data = json.dumps(data).encode("utf-8")
+            response = urllib.request.urlopen(req, encoded_data)
+            response_data = response.read().decode("utf-8")
+
+            response_json = json.loads(response_data)
+            return response_json
+
+        else:
+            return False
+
+    except:
+        return str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1])
+
+
+def trigger_user_action(headers, action, actiondata=None):
     # actions should require username only (e.g password reset)
     user_action_url = os.environ['useractionurl']
     try:
@@ -466,16 +500,29 @@ def showpage(pages):
 
             # peopleadmin
             elif pages == "peopleadmin":
+                headers = app.current_request.headers
+
                 # Reject non-admin user
                 if user_data['is_admin'] != "True":
                     return _send_404()
 
-                content = dict()
-                content['icon_path'] = icon_path
-                content['apiurl'] = iowt_api_url + "/" + pages
-                content['isadmin'] = user_data['is_admin']
-                content['username'] = user_data['username']
 
+                authapi_response = trigger_admin_action(headers, "getallusers")
+                if not authapi_response:
+                    return _send_500(authapi_response)
+
+                else:
+                    people = list()
+                    content = dict()
+
+                    for person in authapi_response:
+                        people.append(authapi_response[person])
+
+                    content['icon_path'] = icon_path
+                    content['apiurl'] = iowt_api_url + "/" + pages
+                    content['isadmin'] = user_data['is_admin']
+                    content['username'] = user_data['username']
+                    content['people'] = people
 
             # myhome
             elif pages == "myhome":

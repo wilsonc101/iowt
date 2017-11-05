@@ -217,6 +217,34 @@ def is_admin(client, userpool_id, username, admin_group="admin"):
         return(result, data)
 
 
+def get_all_users(client, userpool_id):
+    try:
+        response = client.list_users(UserPoolId=userpool_id)
+
+        people = dict()
+        for user in response['Users']:
+            person = dict()
+            person['personUsername'] = user['Username']
+
+            if user['Enabled']:
+                person['personStatus'] = "enabled"
+            else:
+                person['personStatus'] = "disabled"
+
+            for attribute in user['Attributes']:
+                if attribute['Name'] == "email":
+                    person['personEmail'] = attribute['Value']
+                elif attribute['Name'] == "email_verified":
+                    person['personEmailVerified'] = attribute['Value']
+
+            people[user['Username']] = person
+
+        return(True, people)
+
+    except:
+        return(False, sys.exc_info()[1])
+
+
 def render_s3_template(client, bucket, template_name, content=None):
     # If no conent is supplied, set to empty dict
     if content is None:
@@ -701,3 +729,45 @@ def useraction():
                         status_code=200,
                         headers=default_header)
 
+
+@app.route('/useradmin',
+           methods=['POST'])
+def useradmin():
+    try:
+        json_body = app.current_request.json_body
+        access_token = json_body['access_token'].decode("utf-8")
+        action = json_body['action'].decode("utf-8")
+
+        # all methods should return a list which will be passed back unmodified
+        # calling user must be an admin
+        valid_actions = {"getallusers": get_all_users}
+
+        result, data = get_token_data(jwk_sets, access_token)
+
+
+
+        # Get admin group membership
+        admin_result, admin_user = is_admin(idp_client,
+                                            cognito_pool_id,
+                                            data['username'],
+                                            admin_group=cognito_admin_group)
+
+
+        if result and admin_result:
+            if admin_user is True and action in valid_actions:
+                action_result, action_data = valid_actions[action](idp_client, cognito_pool_id)
+
+                if action_result:
+                    default_header['Content-Type'] = 'application/json; charset=UTF-8'
+
+                    return Response(body=json.dumps(action_data),
+                                    status_code=200,
+                                    headers=default_header)
+                else:
+                    return Response(body=action_data,
+                                    status_code=200,
+                                    headers=default_header)
+    except:
+        return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
+                        status_code=200,
+                        headers=default_header)

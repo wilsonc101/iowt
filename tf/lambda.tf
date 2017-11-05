@@ -63,6 +63,7 @@ resource "aws_lambda_function" "iowt-www" {
       pubbucketurl = "https://s3-eu-west-1.amazonaws.com/iowt-pub/",
       loginurl = "https://api.iowt.robotika.co.uk/token/validatetoken",
       useractionurl = "https://api.iowt.robotika.co.uk/token/useraction",
+      adminactionurl = "https://api.iowt.robotika.co.uk/token/useradmin",
       event_bucket = "iowt-events",
       iowt_events_table = "iowt-events"
       iowt_device_table = "iowt-devices"
