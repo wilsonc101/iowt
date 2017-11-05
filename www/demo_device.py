@@ -25,7 +25,7 @@ creature_weight = 100
 food_level = 100
 water_level = 100
 #device_id = "123abc"
-device_id ="890xyz"
+device_id ="098xyz"
 
 content = copy.deepcopy(CONTENT_TEMPLATE)
 content["timestamp"] = timestamp

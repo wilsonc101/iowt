@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>IOWT - My Things</title>
+  <title>IOWT - Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link href="https://robotika.co.uk/bootstrap.min.css" rel="stylesheet">
   <link href="https://robotika.co.uk/iowt.css" rel="stylesheet">
@@ -23,23 +23,23 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="myhome">{{ icon_path }}</a>
+      <a class="navbar-brand" href="myhome">{{icon_path}}</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-left">
-        {% if isadmin  == "True" %}
+        {% if isadmin == "True" %}
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin<span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a href="thingsadmin">Things</a></li>
-              <li><a href="peopleadmin">People</a></li>
+              <li><a class="active" href="peopleadmin">People</a></li>
             </ul>
           </li>
         {% endif %}
         <li><a href="sightings">Sightings</a></li>
-        <li class="active"><a href="#">My Things</a></li>
+        <li><a href="mythings">My Things</a></li>
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
@@ -53,7 +53,6 @@
         </li>
       </ul>
 
-
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
   </nav>
@@ -61,8 +60,11 @@
     
   <div class="container-fluid">
       <div class="row">
-          <aside class="col-sm-12">
-              <h3>My Things</h3>
+          <aside class="col-sm-1">
+              <h3><span class="label label-warning">Admin</span></h3>
+          </aside>
+          <aside class="col-sm-11">
+              <h3>People</h3>
           </aside>
       </div>
       <div class="row">
@@ -70,76 +72,42 @@
               <table class="table table-hover">
                 <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Name</th>    
-                  <th>Location</th>
+                  <th>Username</th>
+                  <th>Email</th>    
                   <th>Status</th>
                   <th> </th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for device in devices %}
+                {% for person in people %}
                 <tr>
-                    <td>{{device.id}}</td>
-                    <td><em>{{device.deviceName}}</em></td>
-                    <td><em>{{device.deviceLocation}}</em></td>
-                    {% if device.deviceStatus == "online" %}
-                        <td class="success">{{device.deviceStatus}}</td>
-                    {% elif device.deviceStatus == "offline" %}
-                        <td class="danger">{{device.deviceStatus}}</td>
-                    {% else %}
-                        <td class="warning">{{device.deviceStatus}}</td>
-                    {% endif %}
+                    <td>{{person.personUsername}}</td>
+                    <td>{{person.personEmail}}</td>
+                    <td>{{person.personStatus}}</td>
                     <td class="text-right">
-                        <button class="btn btn-default"  
-                                data-deviceid="{{device.id}}"
-                                data-devicename="{{device.deviceName}}"
-                                data-devicelocation="{{device.deviceLocation}}"
-                                data-toggle="modal" 
-                                data-target="#thingModal">Edit</button>
+                    {% if person.personStatus != "disabled" %}
+                        <button class="btn btn-default" id="person-disable" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="person_disable(this);">Disable</button>
+                    {% elif person.personStatus == "disabled" %}
+                        <button class="btn btn-default" id="person-enable" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="person_enable(this);">Enable</button>
+                    {% endif %}
+
+                    {% if person.personStatus == "disabled" %}
+                        <button class="btn btn-default" id="person-delete" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="person_delete(this);">Delete</button>
+                    {% else %}
+                        <button class="btn btn-default disabled" id="person-delete" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="person_delete(this);" disabled="disabled">Delete</button>
+                    {% endif %}
                     </td>
                 </tr>
-                {% endfor %}  
+                {% endfor %}
 
-              </tbody>  
+              </tbody>
               </table>
           </section>
       </div>
   </div>
 
-<!-- Modal -->
-<div class="modal fade" id="thingModal" tabindex="-1" role="dialog" aria-labelledby="thingModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="thingModalLabel">Thing Details</h4>
-      </div>
-      <div class="modal-body">
-        <div class="input-group">
-            <span class="input-group-addon" id="basic-addon1">id       </span>
-            <input class="form-control" type="text" name="deviceId" id="deviceId" placeholder="" readonly />
-        </div>        
-        <div class="input-group">
-            <span class="input-group-addon" id="basic-addon1">name     </span>
-            <input class="form-control" type="text" name="deviceName" id="deviceName" placeholder=""/>
-        </div>        
-        <div class="input-group">
-            <span class="input-group-addon" id="basic-addon1">location </span>
-            <input class="form-control" type="text" name="deviceLocation" id="deviceLocation" placeholder="" />
-        </div>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" data-apiurl="{{apiurl}}" onclick="save_device_data(this);">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-   
 <script src="https://robotika.co.uk/iowt.js"></script>
 
-    
+
 </body>
 </html>

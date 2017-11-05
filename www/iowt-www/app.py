@@ -311,7 +311,8 @@ def showpage(pages):
         request = app.current_request
         # POST - Take incoming posted data (e.g. from forms)
         if request.method == 'POST':
-            avaliable_pages = {"admin": "admin.tmpl",
+            avaliable_pages = {"thingsadmin": "thingsadmin.tmpl",
+                               "peopleadmin": "peopleadmin.tmpl",
                                "mythings": "mythings.tmpl",
                                "settings": "settings.tmpl",
                                "sightings": "sightings.tmpl"}
@@ -353,8 +354,8 @@ def showpage(pages):
 
                 return send_404()
 
-            # admin
-            elif pages == "admin":
+            # thingsadmin
+            elif pages == "thingsadmin":
                 # Reject non-admin user
                 if user_data['is_admin'] != "True":
                     return _send_404()
@@ -386,6 +387,12 @@ def showpage(pages):
                     # Regenerate token and key
                     pass
 
+            # peopleadmin
+            elif pages == "peopleadmin":
+                # Reject non-admin user
+                if user_data['is_admin'] != "True":
+                    return _send_404()
+
 
             # settings
             elif pages == "settings":
@@ -404,7 +411,8 @@ def showpage(pages):
 
         # GET - Render page as requested
         elif request.method == "GET":
-            avaliable_pages = {"admin": "admin.tmpl",
+            avaliable_pages = {"thingsadmin": "thingsadmin.tmpl",
+                               "peopleadmin": "peopleadmin.tmpl",
                                "myhome": "myhome.tmpl",
                                "mythings": "mythings.tmpl",
                                "settings": "settings.tmpl",
@@ -440,8 +448,8 @@ def showpage(pages):
                 content['imageurl'] = sightings_image_url
 
 
-            # admin
-            elif pages == "admin":
+            # thingsadmin
+            elif pages == "thingsadmin":
                 # Reject non-admin user
                 if user_data['is_admin'] != "True":
                     return _send_404()
@@ -454,6 +462,19 @@ def showpage(pages):
                 content['isadmin'] = user_data['is_admin']
                 content['username'] = user_data['username']
                 content['devices'] = things
+
+
+            # peopleadmin
+            elif pages == "peopleadmin":
+                # Reject non-admin user
+                if user_data['is_admin'] != "True":
+                    return _send_404()
+
+                content = dict()
+                content['icon_path'] = icon_path
+                content['apiurl'] = iowt_api_url + "/" + pages
+                content['isadmin'] = user_data['is_admin']
+                content['username'] = user_data['username']
 
 
             # myhome

@@ -30,7 +30,13 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-left">
         {% if isadmin == "True" %}
-          <li class="active"><a href="#">Admin</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a class="active" href="thingsadmin">Things</a></li>
+              <li><a href="peopleadmin">People</a></li>
+            </ul>
+          </li>
         {% endif %}
         <li><a href="sightings">Sightings</a></li>
         <li><a href="mythings">My Things</a></li>
@@ -54,7 +60,10 @@
     
   <div class="container-fluid">
       <div class="row">
-          <aside class="col-sm-12">
+          <aside class="col-sm-1">
+              <h3><span class="label label-warning">Admin</span></h3>
+          </aside>
+          <aside class="col-sm-11">
               <h3>All Things</h3>
           </aside>
       </div>
