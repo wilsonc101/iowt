@@ -86,15 +86,15 @@
                     <td>{{person.personStatus}}</td>
                     <td class="text-right">
                     {% if person.personStatus != "disabled" %}
-                        <button class="btn btn-default" id="person-disable" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="person_disable(this);">Disable</button>
+                        <button class="btn btn-default" id="person-disable" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="user_disable(this);">Disable</button>
                     {% elif person.personStatus == "disabled" %}
-                        <button class="btn btn-default" id="person-enable" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="person_enable(this);">Enable</button>
+                        <button class="btn btn-default" id="person-enable" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="user_enable(this);">Enable</button>
                     {% endif %}
 
                     {% if person.personStatus == "disabled" %}
-                        <button class="btn btn-default" id="person-delete" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="person_delete(this);">Delete</button>
+                        <button class="btn btn-default" id="person-delete" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="user_delete(this);">Delete</button>
                     {% else %}
-                        <button class="btn btn-default disabled" id="person-delete" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="person_delete(this);" disabled="disabled">Delete</button>
+                        <button class="btn btn-default disabled" id="person-delete" data-url="{{apiurl}}" data-username="{{person.personUsername}}" onclick="user_delete(this);" disabled="disabled">Delete</button>
                     {% endif %}
                     </td>
                 </tr>

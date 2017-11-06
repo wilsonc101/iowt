@@ -118,6 +118,42 @@ function device_enable(button) {
 
 };
 
+function user_enable(button) {
+  var userName = $(button).data("username");
+  var apiUrl = $(button).data("url");
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, false);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"username":userName, "action":"enableuser"}));
+  location.reload();
+
+};
+
+function user_disable(button) {
+  var userName = $(button).data("username");
+  var apiUrl = $(button).data("url");
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, false);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"username":userName, "action":"disableuser"}));
+  location.reload();
+
+};
+
+function user_delete(button) {
+  var userName = $(button).data("username");
+  var apiUrl = $(button).data("url");
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, false);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"username":userName, "action":"deleteuser"}));
+  location.reload();
+
+};
+
 function save_user_settings() {
   var newEmail = $("#inputEmail").val();
 

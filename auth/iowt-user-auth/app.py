@@ -217,7 +217,7 @@ def is_admin(client, userpool_id, username, admin_group="admin"):
         return(result, data)
 
 
-def get_all_users(client, userpool_id):
+def get_all_users(client, userpool_id, username=None):
     try:
         response = client.list_users(UserPoolId=userpool_id)
 
@@ -243,6 +243,36 @@ def get_all_users(client, userpool_id):
 
     except:
         return(False, sys.exc_info()[1])
+
+
+def disable_user(client, username, userpool_id):
+    try:
+        response = client.admin_disable_user(Username=username,
+                                             UserPoolId=userpool_id)
+        return(True, {"result": "OK"})
+
+    except:
+        return(False, {"result": str(sys.exc_info()[1])})
+
+
+def enable_user(client, username, userpool_id):
+    try:
+        response = client.admin_enable_user(Username=username,
+                                            UserPoolId=userpool_id)
+        return(True, {"result": "OK"})
+
+    except:
+        return(False, {"result": str(sys.exc_info()[1])})
+
+
+def delete_user(client, username, userpool_id):
+    try:
+        response = client.admin_delete_user(Username=username,
+                                             UserPoolId=userpool_id)
+        return(True, {"result": "OK"})
+
+    except:
+        return(False, {"result": str(sys.exc_info()[1])})
 
 
 def render_s3_template(client, bucket, template_name, content=None):
@@ -737,10 +767,14 @@ def useradmin():
         json_body = app.current_request.json_body
         access_token = json_body['access_token'].decode("utf-8")
         action = json_body['action'].decode("utf-8")
+        action_data = json_body['action_data'].decode("utf-8")
 
         # all methods should return a list which will be passed back unmodified
         # calling user must be an admin
-        valid_actions = {"getallusers": get_all_users}
+        valid_actions = {"getallusers": get_all_users,
+                         "enableuser": enable_user,
+                         "disableuser": disable_user,
+                         "deleteuser": delete_user}
 
         result, data = get_token_data(jwk_sets, access_token)
 
@@ -755,19 +789,22 @@ def useradmin():
 
         if result and admin_result:
             if admin_user is True and action in valid_actions:
-                action_result, action_data = valid_actions[action](idp_client, cognito_pool_id)
+                action_result, action_response = valid_actions[action](client=idp_client,
+                                                                       userpool_id=cognito_pool_id,
+                                                                       username=action_data)
+
 
                 if action_result:
                     default_header['Content-Type'] = 'application/json; charset=UTF-8'
 
-                    return Response(body=json.dumps(action_data),
+                    return Response(body=json.dumps(action_response),
                                     status_code=200,
                                     headers=default_header)
                 else:
-                    return Response(body=action_data,
+                    return Response(body=json.dumps({"result": str(action_response)}),
                                     status_code=200,
                                     headers=default_header)
     except:
-        return Response(body=str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]),
+        return Response(body=str(sys.exc_info()[0]) + " --- " + str(sys.exc_info()[1]),
                         status_code=200,
                         headers=default_header)

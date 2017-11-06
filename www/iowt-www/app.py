@@ -74,7 +74,7 @@ def get_user_data(headers):
         return False
 
 
-def trigger_admin_action(headers, action, actiondata=None):
+def trigger_admin_action(headers, action, actiondata="nothing"):
     # actions should expect JSON response
     admin_action_url = os.environ['adminactionurl']
     try:
@@ -90,7 +90,8 @@ def trigger_admin_action(headers, action, actiondata=None):
 
         if access_token:
             data = {'access_token': access_token,
-                    'action': action}
+                    'action': action,
+                    'action_data': actiondata}
 
             req = urllib.request.Request(admin_action_url)
             req.add_header('Content-Type', 'application/json')
@@ -426,7 +427,14 @@ def showpage(pages):
                 # Reject non-admin user
                 if user_data['is_admin'] != "True":
                     return _send_404()
+                headers = app.current_request.headers
 
+                post_data = ast.literal_eval(app.current_request.raw_body.decode('utf-8'))
+                action = post_data['action']
+                action_data = post_data['username']
+
+                result = trigger_admin_action(headers, action, action_data)
+                return _send_200(result)
 
             # settings
             elif pages == "settings":

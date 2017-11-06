@@ -21,6 +21,9 @@ data "aws_iam_policy_document" "iowt-auth-policy-document" {
     actions = ["cognito-idp:AdminInitiateAuth",
                "cognito-idp:AdminRespondToAuthChallenge",
                "cognito-idp:AdminListGroupsForUser",
+               "cognito-idp:AdminDisableUser",
+               "cognito-idp:AdminEnableUser",
+               "cognito-idp:AdminDeleteUser",
                "cognito-idp:ListUsers",
                "cognito-idp:AdminResetUserPassword",
                "cognito-idp:AdminGetUser"]
