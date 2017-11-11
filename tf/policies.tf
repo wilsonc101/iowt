@@ -99,14 +99,6 @@ data "aws_iam_policy_document" "iowt-www-policy-document" {
 
   statement {
     sid = "6"
-    actions = ["cognito-idp:AdminListGroupsForUser",
-               "cognito-idp:AdminGetUser"]
-    resources = ["arn:aws:cognito-idp:*:*:*"]
-    effect = "Allow"
-  }
-
-  statement {
-    sid = "7"
     actions = ["dynamodb:DeleteItem",
                "dynamodb:PutItem",
                "dynamodb:UpdateItem",
@@ -116,7 +108,7 @@ data "aws_iam_policy_document" "iowt-www-policy-document" {
   }
 
   statement {
-    sid = "8"
+    sid = "7"
     actions = ["dynamodb:DeleteItem",
                "dynamodb:PutItem",
                "dynamodb:UpdateItem",
