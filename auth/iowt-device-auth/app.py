@@ -31,6 +31,10 @@ def authenticate_device(device_id, token, table_name):
         device_record = response['Items'][0]
         device_key = device_record['deviceKey']
 
+        # Refuse disabled device
+        if device_record['deviceStatus'] == "disabled":
+            return (False, {"result": "device disabled"})
+
         key = key_template
         key['k'] = device_key
 

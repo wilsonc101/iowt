@@ -53,6 +53,6 @@ c.request('POST', '/event/newevent', content_as_string, headers=headers)
 res = c.getresponse()
 data = res.read().decode('utf-8')
 
-print(data)
+print(str(res.status) + " -- " + data)
 
 
