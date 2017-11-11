@@ -11,6 +11,7 @@ import urllib
 import ast
 import bleach
 
+
 from chalice import Chalice, Response
 app = Chalice(app_name='iowt-www')
 
@@ -140,6 +141,25 @@ def trigger_user_action(headers, action, actiondata=None):
 
     except:
         return str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1])
+
+
+def check_device_token(device_id, token):
+    device_auth_url = os.environ['deviceauthurl']
+    try:
+        data = {'Device-Id': device_id,
+                'Device-Token': token}
+
+        req = urllib.request.Request(device_auth_url)
+        req.add_header('Content-Type', 'application/json')
+        encoded_data = json.dumps(data).encode("utf-8")
+        response = urllib.request.urlopen(req, encoded_data)
+        response_data = response.read().decode("utf-8")
+
+        response_json = json.loads(response_data)
+        return response_json
+
+    except:
+        return {"result":"False", "data":str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1])}
 
 
 def update_device(table_name, device_id, device_location=None, device_name=None, device_owner=None):
@@ -624,6 +644,7 @@ def makeimage(imageid):
            methods=['POST'])
 def event_post():
 # Posted data structure
+#HEADERS = {"Device-Token": JWE}
 #CONTENT_TEMPLATE = {"timestamp": str(),
 #                    "event_id": str(),
 #                    "device_id": str()
@@ -634,20 +655,33 @@ def event_post():
 #                                   "image_type": str()}}
 
     try:
+        headers = app.current_request.headers
+        if 'Device-Token' not in headers:
+            return _send_404()
+
         s3_bucket = os.environ['event_bucket']
         ddb_table = os.environ['iowt_events_table']
 
         request = app.current_request
         json_data = json.loads(request.raw_body.decode())
 
+
+        token = headers['Device-Token']
+        device_id = json_data['device_id']
+
+        check_result = check_device_token(device_id, token)
+        if not check_result['result']:
+            return _send_404()
+
+
         file_content = base64.b64decode(json_data['event_data']['image_data'])
         metadata = {'timestamp': json_data['timestamp'],
-                    'device_id': json_data['device_id']}
+                    'device_id': device_id}
 
         db_item = dict()
         db_item['id'] = {'S': json_data['event_id'] }
         db_item['timestamp'] = {'S': json_data['timestamp']}
-        db_item['device_id'] = {'S': json_data['device_id']}
+        db_item['device_id'] = {'S': device_id}
         db_item['image_id'] = {'S': json_data['event_id'] + "." + json_data['event_data']['image_type']}
         db_item['creature_weight'] = {'N': str(json_data['event_data']['creature_weight'])}
         db_item['food_level'] = {'N': str(json_data['event_data']['food_level'])}

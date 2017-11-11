@@ -49,6 +49,23 @@ resource "aws_lambda_function" "iowt-api-auth" {
 }
 
 
+resource "aws_lambda_function" "iowt-device-auth" {
+  filename         = "build_files/iowt-device-auth.zip"
+  function_name    = "iowt-device-auth"
+  role             = "${aws_iam_role.iowt-device-auth-role.arn}"
+  handler          = "app.app"
+  runtime          = "python2.7"
+  source_code_hash = "${base64sha256(file("build_files/iowt-device-auth.zip"))}"
+
+  environment {
+    variables = {
+      iowt_device_table = "iowt-devices"
+    }
+  }
+
+}
+
+
 resource "aws_lambda_function" "iowt-www" {
   filename         = "build_files/iowt-www.zip"
   function_name    = "iowt-www"
@@ -64,6 +81,7 @@ resource "aws_lambda_function" "iowt-www" {
       loginurl = "https://api.iowt.robotika.co.uk/token/validatetoken",
       useractionurl = "https://api.iowt.robotika.co.uk/token/useraction",
       adminactionurl = "https://api.iowt.robotika.co.uk/token/useradmin",
+      deviceauthurl = "https://api.iowt.robotika.co.uk/device/deviceauth",
       event_bucket = "iowt-events",
       iowt_events_table = "iowt-events"
       iowt_device_table = "iowt-devices"

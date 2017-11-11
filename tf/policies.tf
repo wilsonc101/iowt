@@ -32,6 +32,27 @@ data "aws_iam_policy_document" "iowt-auth-policy-document" {
   }
 }
 
+data "aws_iam_policy_document" "iowt-device-auth-policy-document" {
+  statement {
+    sid = "1"
+    actions = ["logs:CreateLogGroup",
+               "logs:CreateLogStream",
+               "logs:PutLogEvents"]
+    resources = ["arn:aws:logs:*:*:*"]
+    effect = "Allow"
+  }
+
+  statement {
+    sid = "2"
+    actions = ["dynamodb:DeleteItem",
+               "dynamodb:PutItem",
+               "dynamodb:UpdateItem",
+               "dynamodb:Scan"]
+    resources = ["arn:aws:dynamodb:eu-west-1:*:table/iowt-devices"]
+    effect = "Allow"
+  }
+}
+
 data "aws_iam_policy_document" "iowt-www-policy-document" {
   statement {
     sid = "1"
