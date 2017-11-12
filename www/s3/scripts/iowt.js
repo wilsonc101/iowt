@@ -207,3 +207,23 @@ function signout() {
   document.cookie = 'access=;path=/;domain=.iowt.robotika.co.uk;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
   location.reload();
 };
+
+
+function new_user_data(button) {
+  var userName = $("#userName").val();
+  var userEmail = $("#userEmail").val();
+  var apiUrl = $(button).data("apiurl");
+
+  console.log(userName);
+  console.log(userEmail);
+
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", apiUrl, false);
+  xhttp.setRequestHeader('Content-type', 'application/json');
+  xhttp.send(JSON.stringify({"user-username":userName,
+                             "user-email":userEmail,
+                             "action":"create"}));
+
+  $('#newuserModal').modal('hide');
+
+};
