@@ -4,7 +4,6 @@ $('#thingModal').on('show.bs.modal', function(e) {
   var deviceLocation = e.relatedTarget.dataset.devicelocation;
   var deviceNum = e.relatedTarget.dataset.devicenum;
 
-
   $(e.currentTarget).find('input[name="deviceId"]').val(deviceId);
   $(e.currentTarget).find('input[name="deviceName"]').val(deviceName);
   $(e.currentTarget).find('input[name="deviceLocation"]').val(deviceLocation);
@@ -26,16 +25,21 @@ function save_device_data(button) {
   var deviceName = $("#deviceName").val();
   var apiUrl = $(button).data("apiurl");
 
-  var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", apiUrl, false);
-  xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify({"device-id":deviceId,
-                             "device-name":deviceName, 
-                             "device-location":deviceLocation, 
-                             "action":"update"}));
+  var data_reg = /^[-_a-zA-Z0-9]+(\s+[-_a-zA-Z0-9]+)*$/;
 
-  $('#thingModal').modal('hide');
-  location.reload();
+  if (deviceName.length >= 1 && data_reg.test(deviceName) && deviceLocation.length >= 1 && data_reg.test(deviceLocation)) {
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", apiUrl, false);
+    xhttp.setRequestHeader('Content-type', 'application/json');
+    xhttp.send(JSON.stringify({"device-id":deviceId,
+                               "device-name":deviceName, 
+                               "device-location":deviceLocation, 
+                               "action":"update"}));
+
+    $('#thingModal').modal('hide');
+    location.reload();
+  };
 
 };
 
@@ -44,16 +48,19 @@ function admin_save_device_data(button) {
   var deviceOwner = $("#deviceOwner").val();
   var apiUrl = $(button).data("apiurl");
 
-  var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", apiUrl, false);
-  xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify({"device-id":deviceId,
-                             "device-owner":deviceOwner, 
-                             "action":"update"}));
+  var user_reg = /^([A-z0-9]{1,})$/;
 
-  $('#thingModal').modal('hide');
-  location.reload();
+  if (deviceOwner.length >= 4 && user_reg.test(deviceOwner)) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", apiUrl, false);
+    xhttp.setRequestHeader('Content-type', 'application/json');
+    xhttp.send(JSON.stringify({"device-id":deviceId,
+                               "device-owner":deviceOwner, 
+                               "action":"update"}));
 
+    $('#thingModal').modal('hide');
+    location.reload();
+  };
 };
 
 $('#eventModal').on('show.bs.modal', function(e) {
@@ -214,16 +221,21 @@ function new_user_data(button) {
   var userEmail = $("#userEmail").val();
   var apiUrl = $(button).data("apiurl");
 
-  console.log(userName);
-  console.log(userEmail);
+  var email_reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+  var user_reg = /^([A-z0-9]{1,})$/;
 
-  var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", apiUrl, false);
-  xhttp.setRequestHeader('Content-type', 'application/json');
-  xhttp.send(JSON.stringify({"user-username":userName,
-                             "user-email":userEmail,
-                             "action":"create"}));
+  if (email_reg.test(userEmail) == true && userName.length >= 4 && user_reg.test(userName)) {
+    console.log(userName);
+    console.log(userEmail);
 
-  $('#newuserModal').modal('hide');
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", apiUrl, false);
+    xhttp.setRequestHeader('Content-type', 'application/json');
+    xhttp.send(JSON.stringify({"user-username":userName,
+                               "user-email":userEmail,
+                               "action":"create"}));
 
+    $('#newuserModal').modal('hide');
+  };
 };
+

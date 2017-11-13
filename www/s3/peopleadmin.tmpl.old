@@ -8,10 +8,13 @@
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
   <script src="https://robotika.co.uk/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/css/bootstrapValidator.min.css" rel="stylesheet">
 </head>
 <body>
   <!-- NAV BAR -->    
+  <!-- <div class="container-fluid"> -->
   <nav class="navbar navbar-default">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -55,6 +58,7 @@
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
   </nav>
+  <!-- </div> -->
     
   <div class="container-fluid">
       <div class="row">
@@ -123,23 +127,25 @@
         <h4 class="modal-title" id="newuserModalLabel">Person Details</h4>
       </div>
       <div class="modal-body">
-        <form data-toggle="validator" role="form" id="adduserForm">
+        <form role="form" id="adduserForm">
 
-        <div class="form-group has-feedback">
+        <div class="form-group">
             <label for="userName" class="control-label">Username</label>
-            <input class="form-control" type="text" name="userName" id="userName" pattern="^[_A-z0-9]{1,}$" minlength="4" placeholder="" data-error="Username must not contain special characters and must be longer than 4 characters" required />
-            <div class="help-block with-errors"></div>
+            <input class="form-control" type="text" name="userName" id="userName" placeholder="" required />
         </div>
-        <div class="form-group has-feedback">
+        <div class="form-group">
             <label for="userEmail" class="control-label">Email</label>
-            <input class="form-control" type="text" name="userEmail" id="userEmail" pattern="^([A-Za-z0-9_\-.])+@([A-Za-z0-9_\-.])+.([A-Za-z]{2,4})$" placeholder="" data-error="Please enter a valid email address" required />
-            <div class="help-block with-errors"></div>
+            <input class="form-control" type="email" name="userEmail" id="userEmail" placeholder="" required />
         </div>
+        <div class="form-group">
+            <div id="messages"></div>
+        </div>
+
       </div>
       <div class="modal-footer">
         <div class="form-group">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" data-apiurl="{{apiurl}}" onclick="new_user_data(this);">Add</button>
+        <button type="submit" class="btn btn-primary" data-apiurl="{{apiurl}}" onclick="new_user_data(this);">Add</button>
         </div>
       </div>
 
@@ -147,6 +153,42 @@
     </div>
   </div>
 </div>
+
+
+
+<script>
+$(document).ready(function() {
+    $('#adduserForm').bootstrapValidator({
+        container: '#messages',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            userName: {
+                validators: {
+                    notEmpty: {
+                        message: 'The user name is required and cannot be empty'
+                    }
+                }
+            },
+            userEmail: {
+                validators: {
+                    notEmpty: {
+                        message: 'The email address is required and cannot be empty'
+                    },
+                    emailAddress: {
+                        message: 'The email address is not valid'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+
+
 
 <script src="https://robotika.co.uk/iowt.js"></script>
 

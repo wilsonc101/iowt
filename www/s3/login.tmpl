@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
   <script src="https://robotika.co.uk/bootstrap.min.js"></script>
-    
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js"></script>
 </head>
 <body>
   <!-- NAV BAR -->
@@ -48,17 +48,19 @@
 
     <section class="col-sm-6">
 
-      <form action="/login/authin" method="POST" class="form-horizontal">
+      <form action="/login/authin" method="POST" class="form-horizontal" data-toggle="validator" role="form">
         <div class="form-group">
           <label for="inputEmail" class="col-md-2 control-label">Username</label>
           <div class="col-md-10">
-            <input name="username" type="text" class="form-control" id="inputEmail" placeholder="Username">
+            <input name="username" type="text" class="form-control" id="inputEmail" placeholder="Username" minlength="4" placeholder="" data-error="Please enter a valid username" required >
+            <div class="help-block with-errors"></div>
           </div>
         </div>
         <div class="form-group">
           <label for="inputPassword" class="col-md-2 control-label">Password</label>
           <div class="col-md-10">
-            <input name="password" type="password" class="form-control" id="inputPassword" placeholder="Password">
+            <input name="password" type="password" class="form-control" id="inputPassword" placeholder="Password" minlength="1" data-error="Please enter your password" required>
+            <div class="help-block with-errors"></div>
           </div>
         </div>
 

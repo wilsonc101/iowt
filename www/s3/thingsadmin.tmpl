@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
   <script src="https://robotika.co.uk/bootstrap.min.js"></script>
-    
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js"></script>
 </head>
 <body>
   <!-- NAV BAR -->    
@@ -131,13 +131,15 @@
         <h4 class="modal-title" id="adminthingModalLabel">Thing Details</h4>
       </div>
       <div class="modal-body">
-        <div class="input-group">
-            <span class="input-group-addon" id="basic-addon1">id       </span>
+       <form data-toggle="validator" role="form">
+        <div class="form-group has-feedback">
+            <label for="deviceId" class="control-label">Device ID</label>
             <input class="form-control" type="text" name="deviceId" id="deviceId" placeholder="" readonly />
         </div>
-        <div class="input-group">
-            <span class="input-group-addon" id="basic-addon1">owner    </span>
-            <input class="form-control" type="text" name="deviceOwner" id="deviceOwner" placeholder="" />
+        <div class="form-group has-feedback">
+            <label for="deviceOwner" class="control-label">Owner</label>
+            <input class="form-control" type="text" name="deviceOwner" id="deviceOwner" pattern="^[_A-z0-9]{1,}$" minlength="4" placeholder="" data-error="Owner must not contain special characters and must be longer than 4 characters" required />
+            <div class="help-block with-errors"></div>
         </div>
 
       </div>
@@ -145,6 +147,7 @@
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" data-apiurl="{{apiurl}}" onclick="admin_save_device_data(this);">Save changes</button>
       </div>
+     </form>
     </div>
   </div>
 </div>
