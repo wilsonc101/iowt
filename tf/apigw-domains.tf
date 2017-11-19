@@ -82,5 +82,12 @@ resource "aws_api_gateway_base_path_mapping" "robotika-iowt-api-event" {
   base_path = "event"
 }
 
+resource "aws_api_gateway_base_path_mapping" "robotika-iowt-device-auth" {
+  api_id      = "${aws_api_gateway_rest_api.iowt-device-auth.id}"
+  stage_name  = "${aws_api_gateway_deployment.iowt-device-auth-dev.stage_name}"
+  domain_name = "${aws_api_gateway_domain_name.robotika-iowt-api.domain_name}"
+  base_path = "device"
+}
+
 
 
