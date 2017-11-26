@@ -695,10 +695,60 @@ def event_post():
                              Bucket=s3_bucket,
                              Key=json_data['event_id'] + "." + json_data['event_data']['image_type'])
 
-        return _send_200("OK")
+        action = "none"
+
+        return _send_200({"result": "OK",
+                          "action": action})
 
     except:
         return _send_500(str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]))
 
 
 
+@app.route('/status',
+           methods=['GET', 'POST'])
+def checkstatus():
+    try:
+        request = app.current_request
+        headers = app.current_request.headers
+
+        if 'Device-Token' not in headers:
+            return _send_404()
+
+        token = headers['Device-Token']
+
+
+        ## POST
+        if request.method == 'POST':
+            # Get device ID from body
+            json_data = json.loads(request.raw_body.decode())
+            device_id = json_data['device_id']
+
+            check_result = check_device_token(device_id, token)
+            if not check_result['result']:
+                return _send_404()
+
+            action = "none"
+
+            return _send_200({"result": "OK",
+                              "action": action})
+
+        ## GET
+        elif request.method == 'GET':
+            # Get device ID from header
+            if 'Device-ID' not in headers:
+                return _send_404()
+
+            device_id = headers['Device-ID']
+
+            check_result = check_device_token(device_id, token)
+            if not check_result['result']:
+                return _send_404()
+
+            action = "none"
+
+            return _send_200({"result": "OK",
+                              "action": action})
+
+    except:
+        return _send_500(str(sys.exc_info()[0]) + " -- " + str(sys.exc_info()[1]))

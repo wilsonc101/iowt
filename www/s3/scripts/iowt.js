@@ -10,6 +10,11 @@ $('#thingModal').on('show.bs.modal', function(e) {
 
 });
 
+$('#thingModal').on('hidden.bs.modal', function() {
+    $("#thingForm").validate().resetForm();
+});
+
+
 $('#adminthingModal').on('show.bs.modal', function(e) {
   var deviceId = e.relatedTarget.dataset.deviceid;
   var deviceOwner = e.relatedTarget.dataset.deviceowner;
@@ -42,6 +47,7 @@ function save_device_data(button) {
   };
 
 };
+
 
 function admin_save_device_data(button) {
   var deviceId = $("#deviceId").val();
@@ -238,4 +244,5 @@ function new_user_data(button) {
     $('#newuserModal').modal('hide');
   };
 };
+
 

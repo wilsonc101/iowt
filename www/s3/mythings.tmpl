@@ -7,6 +7,7 @@
   <link href="https://robotika.co.uk/iowt.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
   <script src="https://robotika.co.uk/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js"></script>
 </head>
@@ -116,7 +117,7 @@
         <h4 class="modal-title" id="thingModalLabel">Thing Details</h4>
       </div>
       <div class="modal-body">
-       <form data-toggle="validator" role="form">
+       <form id="thingForm" data-toggle="validator" role="form">
         <div class="input-group">
             <label for="deviceId" class="control-label">Device ID</label>
             <input class="form-control" type="text" name="deviceId" id="deviceId" placeholder="" readonly />

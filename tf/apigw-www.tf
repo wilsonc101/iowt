@@ -138,7 +138,7 @@ resource "aws_lambda_permission" "iowt-www-pages-post" {
 resource "aws_api_gateway_method_response" "iowt-www-pages-get-200" {
   rest_api_id   = "${aws_api_gateway_rest_api.iowt-www.id}"
   resource_id   = "${aws_api_gateway_resource.iowt-www-pages.id}"
-  http_method   = "${aws_api_gateway_method.iowt-www-pages-post.http_method}"
+  http_method   = "${aws_api_gateway_method.iowt-www-pages-get.http_method}"
   status_code = "200"
   response_models = {
     "text/html" = "Empty"
@@ -187,6 +187,72 @@ resource "aws_api_gateway_method_response" "iowt-www-imageid-get-200" {
   rest_api_id   = "${aws_api_gateway_rest_api.iowt-www.id}"
   resource_id   = "${aws_api_gateway_resource.iowt-www-imageid.id}"
   http_method   = "${aws_api_gateway_method.iowt-www-imageid-get.http_method}"
+  status_code = "200"
+  response_models = {
+    "text/html" = "Empty"
+  }
+}
+
+
+## STATUS
+resource "aws_api_gateway_resource" "iowt-www-status" {
+  rest_api_id = "${aws_api_gateway_rest_api.iowt-www.id}"
+  parent_id   = "${aws_api_gateway_rest_api.iowt-www.root_resource_id}"
+  path_part   = "status"
+}
+
+resource "aws_api_gateway_method" "iowt-www-status-get" {
+  rest_api_id   = "${aws_api_gateway_rest_api.iowt-www.id}"
+  resource_id   = "${aws_api_gateway_resource.iowt-www-status.id}"
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "iowt-www-status-post" {
+  rest_api_id   = "${aws_api_gateway_rest_api.iowt-www.id}"
+  resource_id   = "${aws_api_gateway_resource.iowt-www-status.id}"
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "iowt-www-status-get" {
+  rest_api_id             = "${aws_api_gateway_rest_api.iowt-www.id}"
+  resource_id             = "${aws_api_gateway_resource.iowt-www-status.id}"
+  http_method             = "${aws_api_gateway_method.iowt-www-status-get.http_method}"
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.iowt-www.arn}/invocations"
+}
+
+resource "aws_api_gateway_integration" "iowt-www-status-post" {
+  rest_api_id             = "${aws_api_gateway_rest_api.iowt-www.id}"
+  resource_id             = "${aws_api_gateway_resource.iowt-www-status.id}"
+  http_method             = "${aws_api_gateway_method.iowt-www-status-post.http_method}"
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = "arn:aws:apigateway:${var.aws_region}:lambda:path/2015-03-31/functions/${aws_lambda_function.iowt-www.arn}/invocations"
+}
+
+resource "aws_lambda_permission" "iowt-www-status-get" {
+  statement_id  = "AllowExecutionFromAPIGateway-iowt-www-status-get"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.iowt-www.arn}"
+  principal     = "apigateway.amazonaws.com"
+  source_arn = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.iowt-www.id}/*/${aws_api_gateway_method.iowt-www-status-get.http_method}/*"
+}
+
+resource "aws_lambda_permission" "iowt-www-status-post" {
+  statement_id  = "AllowExecutionFromAPIGateway-iowt-www-status-post"
+  action        = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.iowt-www.arn}"
+  principal     = "apigateway.amazonaws.com"
+  source_arn = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.iowt-www.id}/*/${aws_api_gateway_method.iowt-www-status-post.http_method}/*"
+}
+
+resource "aws_api_gateway_method_response" "iowt-www-status-get-200" {
+  rest_api_id   = "${aws_api_gateway_rest_api.iowt-www.id}"
+  resource_id   = "${aws_api_gateway_resource.iowt-www-status.id}"
+  http_method   = "${aws_api_gateway_method.iowt-www-status-get.http_method}"
   status_code = "200"
   response_models = {
     "text/html" = "Empty"
